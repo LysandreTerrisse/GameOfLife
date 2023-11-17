@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script>
+    /* Fonctions de dessin (repris sur le Moodle puis modifié) */
+    
+    function creeHexagone(rayon) {
+        var points = new Array();
+        for (var i = 0; i < 6; ++i) {
+            var angle = i * Math.PI / 3;
+            var x = Math.sin(angle) * rayon;
+            var y = -Math.cos(angle) * rayon;
+            points.push([Math.round(x*100)/100, Math.round(y*100)/100]);
+        }
+        return points;
+    }
+
+    function genereDamier(rayon, liste_terrain, liste_entites) {
+        let nbLignes = liste_terrain.length;
+        let nbColonnes = liste_terrain[0].length; // Ne pas donner une liste_terrain vide 
+        
+        let distance =  rayon - (Math.sin(1 * Math.PI / 3) * rayon);  // plus grande distance entre l'hexagone et le cercle circonscrit
+    
+        d3.select("#tablier").append("svg").attr("width", (nbLignes*2)*2*rayon).attr("height", nbLignes*2*rayon);
+        var hexagone = creeHexagone(rayon);
+        for (var ligne=0; ligne < nbLignes; ligne++) {
+            for (var colonne=0; colonne < nbColonnes; colonne++) {
+                var d = "";
+                var x, y;
+                for (h in hexagone) {
+                    x = hexagone[h][0]+(rayon-distance)*(2+2*colonne) + Math.cos(Math.PI / 6) * rayon * ligne;
+                    y = distance*2 + hexagone[h][1]+(rayon-distance*2)*(1+2*ligne);
+                    if (h == 0) d += "M"+x+","+y+" L";
+                    else        d +=     x+","+y+" ";
+                }
+                
+                let couleur;
+                switch(liste_terrain[ligne][colonne]) {
+                    case "E": couleur = "blue";  break;
+                    case "P": couleur = "green"; break;
+                    default:  couleur = "grey";
+                }
+                
+                d += "Z";
+                d3.select("svg")
+                .append("path")
+                .attr("d", d)
+                .attr("stroke", "black")
+                .attr("fill", couleur)
+                .attr("id", "h" + ligne + "-" + colonne)
+                .on("click", function(d) {
+                    //On verra plus tard ce qu'il se passe quand on clique
+                });
+            }
+        }
+    }
+    </script>
+    <script>
+    var socket = io();
+    var liste_joueurs = [];
+    var liste_terrain = [];
+    var liste_entites = [];
+    var damier = [];
+    var entites = [];
+    
+    socket.on("infos_pour_chargement_de_page", (liste_joueurs_obtenue, liste_terrain_obtenue, entites_obtenues) => { // Quand on reçoit les informations pour le chargement de la page
+        liste_joueurs = liste_joueurs_obtenue;  // On obtient la liste des joueurs
+        liste_terrain = liste_terrain_obtenue;  // On obtient le terrain
+        entites = entites_obtenues;             // On obtient les entités
+        document.getElementById("paragraphe_liste_joueurs").innerHTML = liste_joueurs.join(" "); // On met à jour l'affichage de la liste des joueurs
+        document.getElementById("paragraphe_nb_joueurs").innerHTML = liste_joueurs.length.toString(); // On met à jour l'affichage du nombre de joueurs
+        
+        if(liste_terrain.length != 0) { // Si l'on obtient un terrain (ce n'est pas toujours le cas : Il faut qu'au moins une personne entre dans
+                                        // la partie (et choisisse des informations cruciales) pour que le terrain se génère
+            genereDamier(20, liste_terrain, liste_entites); // Alors on génère le damier
+        }
+
+    });
+
+    socket.on("tous_les_joueurs_doivent_ajouter", nom_joueur => { // Quand tous les joueurs doivent ajouter un joueur à leur liste
+        liste_joueurs.push(nom_joueur);                             // On ajoute le joueur à notre propre liste
+        document.getElementById("paragraphe_liste_joueurs").innerHTML = liste_joueurs.join(" "); // On met à jour l'affichage de la liste des joueurs
+        document.getElementById("paragraphe_nb_joueurs").innerHTML = liste_joueurs.length.toString(); // On met à jour l'affichage du nombre de joueurs
+        
+        // Si l'on n'a pas encore eu le terrain
+        if(liste_terrain.length == 0) {
+            socket.emit('obtenir_infos_pour_chargement_de_page'); // Alors on demande de nouveau les informations pour charger la page
+            // Cette fois, c'est garantit que l'on aura le terrain, puisqu'il y a au moins un joueur dans la partie qui l'a généré
+        }
+    });
+
+    // Il faut rajouter un cas pour récupérer l'id secret
+    
+    socket.emit('obtenir_infos_pour_chargement_de_page'); // On demande la liste des joueurs et le nombre de joueurs quand on lance la page web
+
+    function jouer() { // Quand on appuie sur le bouton "Jouer"
+        champ_nom_joueur = document.getElementById("champ_nom_joueur");
+        champ_nom_joueur.type = "hidden";
+        document.getElementById("bouton_jouer").type = "hidden";
+        document.getElementById("paragraphe_nom_joueur").innerHTML = champ_nom_joueur.value;
+        socket.emit('ajouter_joueur', champ_nom_joueur.value); // On demande à s'ajouter à la partie (on recevra un identifiant secret)
+    }
+
+    </script>
+</head>
+<body>
+    Nom du joueur : <input type="text" id="champ_nom_joueur" /> <a id="paragraphe_nom_joueur"></a>
+    <input type="button" onclick="jouer()" value="Jouer" id="bouton_jouer"/>
+    </br>
+    Liste des joueurs : <a id="paragraphe_liste_joueurs"></a> </br>
+    Nombre de joueurs : <a id="paragraphe_nb_joueurs"></a> / 2 </br>
+
+    <div id="tablier"></div>
+    
+</body>
+</html>
+
