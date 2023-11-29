@@ -14,7 +14,7 @@ var identifiants_secrets = [];
 var liste_terrain = [];
 
 /* Vont être écrasés par le choix du premier joueur */
-var nb_iterations = 0;
+var nb_iterations_max = 0;
 var nb_joueurs_max = 1;
 
 
@@ -77,14 +77,14 @@ function genererTerrainEtEntites(nb_joueurs, nb_entites_par_joueur, taille_damie
 io.on("connection", socket => {
     
     socket.on("obtenir_infos_pour_chargement_de_page", () => { // Quand un utilisateur demande les informations pour charger la page
-        socket.emit("infos_pour_chargement_de_page", liste_joueurs, liste_terrain, liste_entites); //On lui renvoie la liste des joueurs, le terrain, et les entités
+        socket.emit("infos_pour_chargement_de_page", liste_joueurs, liste_terrain, liste_entites, nb_joueurs_max); //On lui renvoie la liste des joueurs, le terrain, les entités, et le nombre de joueurs max
     });
     
 
 
-    socket.on("ajouter_joueur", (nom_joueur, nb_iterations_choisi, nb_joueurs_max_choisi) => { // Quand un utilisateur veut jouer
+    socket.on("ajouter_joueur", (nom_joueur, nb_iterations_max_choisi, nb_joueurs_max_choisi) => { // Quand un utilisateur veut jouer
         if(liste_joueurs.length == 0) { // Si c'est le premier utilisateur à vouloir jouer
-            nb_iterations = nb_iterations_choisi; // Alors il nous a aussi envoyé un nombre d'itérations
+            nb_iterations_max = nb_iterations_choisi; // Alors il nous a aussi envoyé un nombre d'itérations
             nb_joueurs_max = nb_joueurs_max_choisi; // Et un nombre de joueurs maximal
             genererTerrainEtEntites(nb_joueurs_max, 50, 13)
         }
@@ -97,7 +97,7 @@ io.on("connection", socket => {
             identifiants_secrets.push(identifiant_secret); // On stocke l'identifiant secret (sinon ce serait très con)
             
             if(liste_joueurs.length==nb_joueurs_max) {// Maintenant que l'on a ajouté un joueur, est-ce que l'on a atteint la limite maximale ?
-                //startNewGame();                        // Si oui, on commence la partie
+                commencerPartie();                        // Si oui, on commence la partie
             }
         }
     });
