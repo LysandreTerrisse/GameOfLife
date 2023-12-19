@@ -4,7 +4,6 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="./fonctions_de_jeu.js" type="text/javascript" language="javascript"></script>
-    <script>console.log(__dirname);</script>
     <script src="./fonctions_de_dessin.js"></script>
     <script src="./fonctions_interface.js"></script>
     <script>
@@ -27,8 +26,8 @@
             //Si l'on n'avait pas encore généré puis affiché le terrain, on le fait
             if(liste_terrain.length==0) {
                 liste_terrain = genererTerrain(infos.nb_joueurs_max, infos.nb_lignes, infos.nb_colonnes);
-                liste_entites = genererEntites(infos.nb_joueurs_max, infos.nb_lignes, infos.nb_colonnes)
-                preparerTablier(10, 30)
+                liste_entites = genererEntites(infos.nb_joueurs_max, infos.nb_entites_par_joueur, infos.nb_lignes, infos.nb_colonnes)
+                dessinerPremiereFois(liste_terrain, liste_entites, 10, 30);
             }
             
             // Si l'on a le bon nombre de joueurs
@@ -46,18 +45,18 @@
     
     /* S'exécute quand on appuie sur le bouton "Jouer" */
     function demanderJoindrePartie() {
-        // On envoie une requête au serveur
-        let [nom_joueur, nb_iterations, nb_joueurs, nb_lignes, nb_colonnes] = extraireDepuisInterface();
-        socket.emit('ajouter_joueur', nom_joueur, nb_joueurs, nb_iterations, nb_lignes, nb_colonnes);
-        
         // On enlève les inputs de connexion
         enleverInputsDeConnexion();
+        // On envoie une requête au serveur
+        let [nom_joueur, nb_joueurs, nb_entites_par_joueur, nb_iterations, nb_lignes, nb_colonnes] = extraireDepuisInterface();
+        socket.emit('ajouter_joueur', nom_joueur, nb_joueurs, nb_entites_par_joueur, nb_iterations, nb_lignes, nb_colonnes);
+        
+        
     }
     
     /*
     
     Il ne reste plus qu'à :
-    - Faire choisir le nombre de créatures par joueur au premier joueur
     - Faire des entités avec des sexes différents
     - Empêcher les entités d'entrer dans les tanière adverses
     - Faire en sorte que les entités puissent se reproduire dans la tanière
@@ -83,11 +82,13 @@
         <div id="menu_creation_partie">
             <h3>Création d'une partie</h3>
             Nombre de joueurs : <input type="number" id="champ_nb_joueurs" /></br>
+            Nombre d'entités par joueur : <input type="number" id="champ_nb_entites_par_joueur" /></br>
             Nombre d'itérations : <input type="number" id="champ_nb_iterations" /></br>
             Nombre de lignes : <input type="number" id="champ_nb_lignes" /></br>
             Nombre de colonnes : <input type="number" id="champ_nb_colonnes" /></br>
         </div>
         <div id="menu_partie">
+            <h3>Jeu de la vie</h3>
             Nom du joueur : <a id="paragraphe_nom_joueur"></a>
             Liste des joueurs : <a id="paragraphe_liste_joueurs"></a> </br>
         </div>
