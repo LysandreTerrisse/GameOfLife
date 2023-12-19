@@ -34,7 +34,7 @@ function genererTerrain(nb_joueurs_max, nb_lignes, nb_colonnes) {
     for(let i=0; i<nb_lignes; i++) { // Pour chaque ligne
         liste_terrain[i] = [];
         for(let j=0; j<nb_colonnes; j++) { // Pour chaque colonne
-            let tuile = Math.floor(Math.random()*(nb_eau+nb_prairie+nb_rocher)) // On pioche une tuile au hasard
+            let tuile = randint(0, nb_eau+nb_prairie+nb_rocher - 1) // On pioche une tuile au hasard
             switch(true) {
                 case (tuile < nb_eau)                          : liste_terrain[i][j]="E"; nb_eau--    ; break; // Si c'est de l'eau
                 case (tuile < nb_eau + nb_prairie)             : liste_terrain[i][j]="P"; nb_prairie--; break; // Si c'est de la prairie
@@ -51,13 +51,21 @@ function genererTerrain(nb_joueurs_max, nb_lignes, nb_colonnes) {
     return liste_terrain;
 }
 
-function genererEntites(nb_joueurs_max, nb_entites_par_joueur, nb_lignes, nb_colonnes) {
-    //On crée un tableau qui contient, pour chaque joueur, un tableau qui contient, pour chaque entité, un tuple ((posX, posY), hydratation, satiete, temps_abstinence)
+function genererEntites(nb_joueurs_max, nb_entites_par_joueur, liste_forces, liste_perceptions, liste_taux_reproduction, nb_lignes, nb_colonnes) {
     let liste_entites = []
     for(let i=0; i<nb_joueurs_max; i++) {
         liste_entites[i] = [];
         for(let j=0; j<nb_entites_par_joueur; j++) {
-            liste_entites[i][j] = {position: getPosTaniere(i, nb_lignes, nb_colonnes), satiete: 5, hydratation: 5, abstinence: 0}
+            liste_entites[i][j] = {
+                position: getPosTaniere(i, nb_lignes, nb_colonnes),
+                satiete: 5,
+                hydratation: 5,
+                abstinence: 0,
+                sexe: randint(0, 1),
+                force: liste_forces[i],
+                perception: liste_perceptions[i],
+                taux_reproduction: liste_taux_reproduction[i]
+            }
         }
     }
     
@@ -71,7 +79,7 @@ function nouvellePosition(nb_lignes, nb_colonnes, entite) {
 
     // Cette opération doit être déterministe (n'inclut pas d'aléatoire)
     //Pour l'instant, l'entité va en haut à droite
-    let choix = ["TOP-LEFT", "TOP-RIGHT", "LEFT", "RIGHT", "BOTTOM-LEFT", "BOTTOM-RIGHT", "STAND-STILL"][Math.floor(Math.random()*7)];
+    let choix = ["TOP-LEFT", "TOP-RIGHT", "LEFT", "RIGHT", "BOTTOM-LEFT", "BOTTOM-RIGHT", "STAND-STILL"][randint(0, 6)];
 
     switch(choix) {
         case "TOP-LEFT": i--; break;
@@ -144,9 +152,7 @@ function tick(liste_entites, liste_terrain, nb_iterations) {
         if(nb_iterations>1) {
             tick(liste_entites, liste_terrain, nb_iterations)
         }
-    }, 1000);
+    }, 100);
 }
 
 console.log("test");
-
-//module.exports = {genererTerrain, genererEntites, tick}
