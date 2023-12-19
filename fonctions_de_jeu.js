@@ -12,7 +12,7 @@ function borner(valeur, a, b) {
 }
 
 /* Renvoie la position [ligne, colonne] de la tanière */
-function getPosTaniere(nb_lignes, nb_colonnes, i) {
+function getPosTaniere(i, nb_lignes, nb_colonnes) {
     switch(i) {
         case 0: return [Math.floor(nb_lignes/2), 0                        ];
         case 1: return [0                      , Math.floor(nb_colonnes/2)];
@@ -41,7 +41,7 @@ function genererTerrain(nb_joueurs_max, nb_lignes, nb_colonnes) {
                 case (tuile < nb_eau + nb_prairie + nb_rocher) : liste_terrain[i][j]="R"; nb_rocher-- ; break; // Si c'est du rocher
                 default: // Si nous n'avons plus de tuiles à piocher (il faut donc placer les tanières)  
                     liste_terrain[i][j] = taniere_a_placer; //On positionne la tanière à la ligne i et colonne j (ce qui n'est pas sa bonne position)
-                    permuter(liste_terrain, getPosTaniere(taniere_a_placer), [i, j]); //Puis on permute cette mauvaise position avec la bonne position
+                    permuter(liste_terrain, getPosTaniere(taniere_a_placer, nb_lignes, nb_colonnes), [i, j]); //Puis on permute cette mauvaise position avec la bonne position
                     
                     taniere_a_placer++;
             }
@@ -51,13 +51,13 @@ function genererTerrain(nb_joueurs_max, nb_lignes, nb_colonnes) {
     return liste_terrain;
 }
 
-function genererEntites(nb_joueurs_max, nb_lignes, nb_colonnes) {
+function genererEntites(nb_joueurs_max, nb_entites_par_joueur, nb_lignes, nb_colonnes) {
     //On crée un tableau qui contient, pour chaque joueur, un tableau qui contient, pour chaque entité, un tuple ((posX, posY), hydratation, satiete, temps_abstinence)
     let liste_entites = []
     for(let i=0; i<nb_joueurs_max; i++) {
         liste_entites[i] = [];
         for(let j=0; j<nb_entites_par_joueur; j++) {
-            liste_entites[i][j] = {position: getPosTaniere(i), satiete: 5, hydratation: 5, abstinence: 0}
+            liste_entites[i][j] = {position: getPosTaniere(i, nb_lignes, nb_colonnes), satiete: 5, hydratation: 5, abstinence: 0}
         }
     }
     
@@ -90,7 +90,7 @@ function nouvellePosition(nb_lignes, nb_colonnes, entite) {
 }
 
 function getTypeTuile(entite, liste_terrain) {
-    return listeTerrain[entite.position[0]][entite.position[1]];
+    return liste_terrain[entite.position[0]][entite.position[1]];
 }
 
 function getNewStats(entite, liste_terrain) {
@@ -108,7 +108,8 @@ function getNewStats(entite, liste_terrain) {
 
 /* Se répète à chaque seconde dès que l'on a suffisamment de joueurs. */
 function tick(liste_entites, liste_terrain, nb_iterations) {
-    setTimeOut(() => {
+    let [nb_lignes, nb_colonnes] = [liste_terrain.length, liste_terrain[0].length];
+    setTimeout(() => {
         entites_a_supprimer = []
         //Pour chaque tribu
         for(let i in liste_entites) {
@@ -117,13 +118,13 @@ function tick(liste_entites, liste_terrain, nb_iterations) {
             //Pour chaque entité
             for(let entite of tribu) {
                 //On met à jour sa position
-                entite.position = nouvellePosition(entite)
+                entite.position = nouvellePosition(nb_lignes, nb_colonnes, entite);
                 //On met à jour ses stats
                 [entite.hydratation, entite.satiete, entite.abstinence] = getNewStats(entite, liste_terrain);
                 //Si elle doit mourir
                 if(entite.hydratation<=0 || entite.satiete<=0) {
                     //On la stocke dans les entités à supprimer
-                    //entites_a_supprimer[i].push(entite)
+                    entites_a_supprimer[i].push(entite)
                 }
             }
         }
