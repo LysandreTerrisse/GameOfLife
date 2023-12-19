@@ -22,8 +22,8 @@ function hexagoneSerialise(rayon, rayon_tuiles, position) {
 
 
 /* Crée une toile. Il ne faut pas appeler cette fonction plusieurs fois. */
-function preparerTablier(nb_lignes, nb_colonnes, rayon_entites, rayon_tuiles) {
-    
+function dessinerPremiereFois(liste_terrain, liste_entites, rayon_entites, rayon_tuiles) {
+    let [nb_lignes, nb_colonnes] = [liste_terrain.length, liste_terrain[0].length]
     let distance_tuiles = rayon_tuiles*Math.cos(Math.PI / 6);
     
     d3.select("#tablier").append("svg")
@@ -35,8 +35,7 @@ function preparerTablier(nb_lignes, nb_colonnes, rayon_entites, rayon_tuiles) {
     .attr("height", "100%")
     .attr("fill", "pink")
     
-    dessiner(rayon_entites, rayon_tuiles);
-    
+    dessiner(liste_terrain, liste_entites, rayon_entites, rayon_tuiles);
 }
 
 
