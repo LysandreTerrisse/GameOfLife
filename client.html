@@ -6,6 +6,7 @@
     <script src="./fonctions_de_jeu.js" type="text/javascript" language="javascript"></script>
     <script src="./fonctions_de_dessin.js"></script>
     <script src="./fonctions_interface.js"></script>
+    <script src="./fonctions_aleatoire.js"></script>
     <script>
     //var {genererTerrain, genererEntites, tick} = require("./fonctions_de_jeu");
     //var {enleverInputsCreationPartie, enleverInputsDeConnexion} = require("./fonctions_de_dessin");
@@ -15,8 +16,13 @@
     var liste_entites = [];
     var identifiant_secret = 0;
     
-    
     socket.on("infos", (infos) => { // Quand on reçoit les infos du serveur
+        console.log(infos);
+        //On obtient la graine de génération pseudo-aléatoire du serveur
+        if(!isSeedSet()) {
+          setSeed(infos.seed);
+        }
+        
         //S'il y a au moins un joueur
         if(infos.liste_joueurs.length != 0) {
             //On modifie l'interface
@@ -26,7 +32,7 @@
             //Si l'on n'avait pas encore généré puis affiché le terrain, on le fait
             if(liste_terrain.length==0) {
                 liste_terrain = genererTerrain(infos.nb_joueurs_max, infos.nb_lignes, infos.nb_colonnes);
-                liste_entites = genererEntites(infos.nb_joueurs_max, infos.nb_entites_par_joueur, infos.nb_lignes, infos.nb_colonnes)
+                liste_entites = genererEntites(infos.nb_joueurs_max, infos.nb_entites_par_joueur, infos.liste_forces, infos.liste_perceptions, infos.liste_taux_reproduction, infos.nb_lignes, infos.nb_colonnes)
                 dessinerPremiereFois(liste_terrain, liste_entites, 10, 30);
             }
             
@@ -47,28 +53,42 @@
     function demanderJoindrePartie() {
         // On enlève les inputs de connexion
         enleverInputsDeConnexion();
+        // On extrait les informations des champs
+        let [nom_joueur, force, perception, taux_reproduction, nb_joueurs, nb_entites_par_joueur, nb_iterations, nb_lignes, nb_colonnes] = extraireDepuisInterface();
+        // On affiche le nom du joueur
+        document.getElementById("paragraphe_nom_joueur").innerHTML = nom_joueur;
+
+        //On prépare les informations à envoyer
+        let infos_client = {
+            nom_joueur: nom_joueur,
+            force: force,
+            perception: perception,
+            taux_reproduction: taux_reproduction,
+            nb_joueurs_max: nb_joueurs,
+            nb_entites_par_joueur: nb_entites_par_joueur,
+            nb_iterations_max: nb_iterations,
+            nb_lignes: nb_lignes,
+            nb_colonnes: nb_colonnes
+        }
+
         // On envoie une requête au serveur
-        let [nom_joueur, nb_joueurs, nb_entites_par_joueur, nb_iterations, nb_lignes, nb_colonnes] = extraireDepuisInterface();
-        socket.emit('ajouter_joueur', nom_joueur, nb_joueurs, nb_entites_par_joueur, nb_iterations, nb_lignes, nb_colonnes);
-        
-        
+        socket.emit('ajouter_joueur', infos_client);
     }
     
     /*
     
     Il ne reste plus qu'à :
-    - Faire des entités avec des sexes différents
     - Empêcher les entités d'entrer dans les tanière adverses
     - Faire en sorte que les entités puissent se reproduire dans la tanière
     
     - Faire en sorte que les entités ne peuvent pas se traverser sauf dans la tanière (on peut faire ça avec un algorithme efficace en faisant une liste_positions_prises)
-    - Programmer une fonction random(seed)
     - Implémenter le système de pouvoir pousser les autres entités
     - Faire un algorithme de plus court chemin
     - Implémenter le paramètre "vision à distance"
     - Implémenter un algorithme de choix
-    
-    - Faire des entités non binaires
+    - Implémenter le système de points
+    - Implémenter plus de deux sexes
+    - Empêcher l'appui de boutons lorsque paramètres invalides
     */
     </script>
 </head>
@@ -77,7 +97,10 @@
         <div id="menu_connexion">
             <h3>Connexion</h3>
             Nom du joueur : <input type="text" id="champ_nom_joueur" /> </br>
-            Liste des joueurs : <a id="paragraphe_liste_joueurs"></a> </br>
+            Nombre de points non répartis : <a id="paragraphe_points_non_repartis"></a> / 9 </br> <!-- À implémenter -->
+            Force des créatures : <input type="range" id="champ_force" oninput="updateStats()" min="1" max="5" value="3" /> <a id="paragraphe_force"></a> </br> <!-- À implémenter -->
+            Perception des créatures : <input type="range" id="champ_perception" oninput="updateStats()" min="1" max="5" value="3" /> <a id="paragraphe_perception"></a> </br> <!-- À implémenter -->
+            Taux de reproduction des créatures : <input type="range" id="champ_taux_reproduction" oninput="updateStats()" min="1" max="5" value="3" /> <a id="paragraphe_taux_reproduction"></a> </br> <!-- À implémenter -->
         </div>
         <div id="menu_creation_partie">
             <h3>Création d'une partie</h3>
@@ -89,16 +112,15 @@
         </div>
         <div id="menu_partie">
             <h3>Jeu de la vie</h3>
-            Nom du joueur : <a id="paragraphe_nom_joueur"></a>
+            Nom du joueur : <a id="paragraphe_nom_joueur"></a> </br>
             Liste des joueurs : <a id="paragraphe_liste_joueurs"></a> </br>
         </div>
         
-        <input type="button" onclick="demanderJoindrePartie()" value="Jouer" id="bouton_jouer"/>
+        <input type="button" id="bouton_jouer" onclick="demanderJoindrePartie()" value="Jouer" />
     </header>
-    
+    <script>updateStats();</script>
     
 
     <div id="tablier"></div>
-    
 </body>
 </html>
