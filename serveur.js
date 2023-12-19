@@ -11,6 +11,7 @@ server.listen(8888, () => {
 var infos = {
     liste_joueurs: [],
     nb_joueurs_max: 0,
+    nb_entites_par_joueur: 0,
     nb_iterations_max: 0,
     nb_lignes: 0,
     nb_colonnes: 0,
@@ -25,11 +26,13 @@ io.on("connection", socket => {
     
     socket.on("obtenir_infos", () => { // Quand un utilisateur demande les infos
         socket.emit("infos", infos); //On lui renvoie les infos
+        
     });
     
-    socket.on("ajouter_joueur", (nom_joueur, nb_joueurs_max, nb_iterations_max, nb_lignes, nb_colonnes) => { // Quand un utilisateur veut jouer
+    socket.on("ajouter_joueur", (nom_joueur, nb_joueurs_max, nb_entites_par_joueur, nb_iterations_max, nb_lignes, nb_colonnes) => { // Quand un utilisateur veut jouer
         if(infos.liste_joueurs.length == 0) { // Si c'est le premier utilisateur à vouloir jouer
             infos.nb_joueurs_max = Math.max(Math.min(nb_joueurs_max, 4), 1); // Alors il nous a aussi envoyé un nombre de joueurs max
+            infos.nb_entites_par_joueur = Math.max(Math.min(nb_joueurs_max, 200), 1) // Et un nombre d'entités par joueur
             infos.nb_iterations_max = Math.max(nb_iterations_max, 10); // Et un nombre d'itérations maximal
             infos.nb_lignes = Math.max(nb_lignes, 3); // Et un nombre de lignes
             infos.nb_colonnes = Math.max(nb_colonnes, 3); // Et un nombre de colonnes
@@ -48,4 +51,16 @@ io.on("connection", socket => {
 
 app.get("/", function(request, response) {
     response.sendFile("client.html", {root: __dirname});
+});
+
+app.get("/fonctions_de_jeu.js", function(request, response) {
+    response.sendFile("fonctions_de_jeu.js", {root: __dirname});
+});
+
+app.get("/fonctions_de_dessin.js", function(request, response) {
+    response.sendFile("fonctions_de_dessin.js", {root: __dirname});
+});
+
+app.get("/fonctions_interface.js", function(request, response) {
+    response.sendFile("fonctions_interface.js", {root: __dirname});
 });
