@@ -1,39 +1,29 @@
-Entre 1 à 4 joueurs
-Créatures mâle et femelle
-Les joueurs peuvent paramétrer leurs créatures
-Le gagnant est celui qui a le plus de créatures
-Le premier joueur choisira le nombre de joueurs
-Chaque joueur doit répartir 9 points sur trois axes entre 1 et 5
-- Taux de reproduction
-- Perception (repérer à distance les ressources)
-- Force (conserver/occuper une case convoitée/occupée par une créature d'une autre espèce)
-13*13 hexagones
-Hexagones tanières, puis eau (15%), prairie (35%) et rocher (50%)
-Les créatures ne peuvent pas partager un seul hexagone, sauf la tanière
-Si une créature est plus forte qu'une autre d'une autre espèce, elle peut la pousser s'il y a de la place
-Chaque tanière est au centre d'un bord de terrain
-Les créatures naissent et se reproduisent dans la tanière
-Etat physiologique:
-- Taux d'hydratation entre 0 et 10
-- Taux de satiété entre 0 et 10
-Une case eau donne 3 unité d'hydratation par tour
-Une case prairie donne 2 unité de satiété par tour
-Un déplacement coûte 0.5 d'hydratation et 0.5 de satiété
-Un non-déplacement coûte 0.5 d'hydratation et 0.25 de satiété
-La créature meurt quand l'hydratation ou la satiété vaut 0
-Dès que le taux d'hydratation et de satiété sont au moins de 6, la créature revient vers sa tanière pour se reproduire
-Si deux créatures s'y trouvent et n'ont pas enfanté depuis 5 tours, elles feront une nouvelle créature
-Un joueur pourra déplacer un hexagone prairie ou eau avec un hexagone rocher (pendant l'évolution)
+Fait :
+    - Entre 1 à 4 joueurs
+    - Créatures mâle et femelle
+    - Le premier joueur choisira le nombre de joueurs
+    - 13*13 hexagones
+    - Hexagones tanières, puis eau (15%), prairie (35%) et rocher (50%)
+    - Chaque tanière est au centre d'un bord de terrain
+    - Taux d'hydratation entre 0 et 10
+    - Taux de satiété entre 0 et 10
+    - Une case eau donne 3 unité d'hydratation par tour
+    - Une case prairie donne 2 unité de satiété par tour
+    - Un déplacement coûte 0.5 d'hydratation et 0.5 de satiété
+    - Un non-déplacement coûte 0.5 d'hydratation et 0.25 de satiété
+    - La créature meurt quand l'hydratation ou la satiété vaut 0
 
-Il y a autant de petits que le taux de reproduction
-Le nombre de tours est choisi par le premier joueur
-
-
-0: tanière joueur 0
-1: tanière joueur 1
-2: tanière joueur 2
-3: tanière joueur 3
-
-4: roche
-5: prairie
-6: eau
+À faire :
+    - Le gagnant est celui qui a le plus de créatures
+    - Chaque joueur doit répartir 9 points sur trois axes entre 1 et 5
+        - Taux de reproduction
+        - Perception (repérer à distance les ressources)
+        - Force (conserver/occuper une case convoitée/occupée par une créature d'une autre espèce)
+    - Si une créature est plus forte qu'une autre d'une autre espèce, elle peut la pousser s'il y a de la place
+    - Les créatures ne peuvent pas partager un seul hexagone, sauf la tanière
+    - Les créatures naissent et se reproduisent dans la tanière
+    - Dès que le taux d'hydratation et de satiété sont au moins de 6, la créature revient vers sa tanière pour se reproduire
+    - Si deux créatures s'y trouvent et n'ont pas enfanté depuis 5 tours, elles feront une nouvelle créature
+    - Un joueur pourra déplacer un hexagone prairie ou eau avec un hexagone rocher (pendant l'évolution)
+    - Il y a autant de petits que le taux de reproduction
+    - Le nombre de tours est choisi par le premier joueur
