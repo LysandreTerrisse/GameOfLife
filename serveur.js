@@ -10,16 +10,23 @@ server.listen(8888, () => {
 
 var infos = {
     liste_joueurs: [],
+    liste_forces: [],
+    liste_perceptions: [],
+    liste_taux_reproduction: [],
     nb_joueurs_max: 0,
     nb_entites_par_joueur: 0,
     nb_iterations_max: 0,
     nb_lignes: 0,
     nb_colonnes: 0,
-    graine_aleatoire: Math.random()
+    seed: Math.floor(Math.random()*1000000) //Un entier réellement aléatoire dans [0;99]
 }
 
 var infos_privees = {
     identifiants_secrets: []
+}
+
+function borner(valeur, a, b) {
+    return Math.min(Math.max(valeur, a), b)
 }
 
 io.on("connection", socket => {
@@ -29,22 +36,30 @@ io.on("connection", socket => {
         
     });
     
-    socket.on("ajouter_joueur", (nom_joueur, nb_joueurs_max, nb_entites_par_joueur, nb_iterations_max, nb_lignes, nb_colonnes) => { // Quand un utilisateur veut jouer
+    socket.on("ajouter_joueur", (infos_client) => { // Quand un utilisateur veut jouer
         if(infos.liste_joueurs.length == 0) { // Si c'est le premier utilisateur à vouloir jouer
-            infos.nb_joueurs_max = Math.max(Math.min(nb_joueurs_max, 4), 1); // Alors il nous a aussi envoyé un nombre de joueurs max
-            infos.nb_entites_par_joueur = Math.max(Math.min(nb_joueurs_max, 200), 1) // Et un nombre d'entités par joueur
-            infos.nb_iterations_max = Math.max(nb_iterations_max, 10); // Et un nombre d'itérations maximal
-            infos.nb_lignes = Math.max(nb_lignes, 3); // Et un nombre de lignes
-            infos.nb_colonnes = Math.max(nb_colonnes, 3); // Et un nombre de colonnes
+            infos.nb_joueurs_max        = borner(infos_client.nb_joueurs_max, 1, 4); // Alors il nous a aussi envoyé un nombre de joueurs max
+            infos.nb_entites_par_joueur = borner(infos_client.nb_entites_par_joueur, 1, 200); // Et un nombre d'entités par joueur
+            infos.nb_iterations_max     = Math.max(infos_client.nb_iterations_max, 10); // Et un nombre d'itérations maximal
+            infos.nb_lignes             = borner(infos_client.nb_lignes, 3, 50); // Et un nombre de lignes
+            infos.nb_colonnes           = borner(infos_client.nb_colonnes, 3, 50); // Et un nombre de colonnes
         }
 
-        if(infos.liste_joueurs.length!=infos.nb_joueurs_max) { // S'il y a la place pour que l'utilisateur puisse jouer
-            infos.liste_joueurs.push(nom_joueur); // Alors on l'ajoute à la liste des joueurs
-            io.emit("infos", infos); // On renvoie les infos à tout le monde
+        // S'il y a la place pour que l'utilisateur puisse jouer
+        if(infos.liste_joueurs.length!=infos.nb_joueurs_max) {
+            // Alors on l'ajoute à la liste des joueurs
+            infos.liste_joueurs.push(infos_client.nom_joueur);
+            //On stocke les trois statistiques qu'il a donné pour ses entités
+            infos.liste_forces.push(borner(infos_client.force, 1, 5));
+            infos.liste_perceptions.push(borner(infos_client.perception, 1, 5));
+            infos.liste_taux_reproduction.push(borner(infos_client.taux_reproduction, 1, 5)); // À modifier : Il faudra tester que la somme des stats est plus petit ou égale à 9
+            // On renvoie les infos à tout le monde
+            io.emit("infos", infos); 
             
-            let identifiant_secret = Math.random(); // On lui génère un identifiant secret (un flottant)
-            infos_privees.identifiants_secrets.push(identifiant_secret) // On stocke cet identifiant secret (sinon ce serait très con)
-            socket.emit("identifiant_secret", identifiant_secret); // On lui envoie l'identifiant secret
+            // On lui génère un identifiant secret dans [0;999999], on le stocke, et on le lui envoie
+            let identifiant_secret = Math.floor(Math.random()*1000000)
+            infos_privees.identifiants_secrets.push(identifiant_secret)
+            socket.emit("identifiant_secret", identifiant_secret); 
         }
     });
 });
@@ -63,4 +78,8 @@ app.get("/fonctions_de_dessin.js", function(request, response) {
 
 app.get("/fonctions_interface.js", function(request, response) {
     response.sendFile("fonctions_interface.js", {root: __dirname});
+});
+
+app.get("/fonctions_aleatoire.js", function(request, response) {
+    response.sendFile("fonctions_aleatoire.js", {root: __dirname});
 });
