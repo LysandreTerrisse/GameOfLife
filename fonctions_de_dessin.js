@@ -88,7 +88,7 @@ function dessinerEntites(liste_entites, rayon, rayon_tuiles) {
         .append("path")
         .attr("d", hexagoneSerialise(rayon, rayon_tuiles, liste_entites[i].position))
         .attr("stroke", "white")
-        .attr("fill", getCouleur(i))
+        .attr("fill", getCouleur(liste_entites[i].tribu))
         .attr("id", "e" + i); // e pour "entité"
     }
 }
