@@ -54,9 +54,9 @@ function genererTerrain(nb_joueurs_max, nb_lignes, nb_colonnes) {
 function genererEntites(nb_joueurs_max, nb_entites_par_joueur, liste_forces, liste_perceptions, liste_taux_reproduction, nb_lignes, nb_colonnes) {
     let liste_entites = []
     for(let i=0; i<nb_joueurs_max; i++) {
-        liste_entites[i] = [];
         for(let j=0; j<nb_entites_par_joueur; j++) {
-            liste_entites[i][j] = {
+            liste_entites.push({
+                tribu: i,
                 position: getPosTaniere(i, nb_lignes, nb_colonnes),
                 satiete: 5,
                 hydratation: 5,
@@ -65,7 +65,7 @@ function genererEntites(nb_joueurs_max, nb_entites_par_joueur, liste_forces, lis
                 force: liste_forces[i],
                 perception: liste_perceptions[i],
                 taux_reproduction: liste_taux_reproduction[i]
-            }
+            });
         }
     }
     
@@ -96,6 +96,14 @@ function nouvellePosition(nb_lignes, nb_colonnes, entite) {
     
     return [i, j]
 }
+
+/* Prend une liste de tribus contenant des entités, et renvoie une matrice de */
+/* même taille que le terrain contenant les entités aux bons emplacements.    */
+/*function getMatriceEntites(liste_terrain, liste_entites) {
+    for(let tribu of liste_entites)
+}*/
+
+
 
 function getTypeTuile(entite, liste_terrain) {
     return liste_terrain[entite.position[0]][entite.position[1]];
@@ -147,30 +155,17 @@ function boucle(debut_partie, liste_entites, liste_terrain, nb_iterations_max, i
 function tick(liste_entites, liste_terrain) {
     let [nb_lignes, nb_colonnes] = [liste_terrain.length, liste_terrain[0].length];
     
-    entites_a_supprimer = []
-    //Pour chaque tribu
-    for(let i in liste_entites) {
-        let tribu = liste_entites[i];
-        entites_a_supprimer[i] = []
-        //Pour chaque entité
-        for(let entite of tribu) {
-            //On met à jour sa position
-            entite.position = nouvellePosition(nb_lignes, nb_colonnes, entite);
-            //On met à jour ses stats
-            [entite.hydratation, entite.satiete, entite.abstinence] = getNewStats(entite, liste_terrain);
-            //Si elle doit mourir
-            if(entite.hydratation<=0 || entite.satiete<=0) {
-                //On la stocke dans les entités à supprimer
-                //entites_a_supprimer[i].push(entite)
-            }
-        }
-    }
-    
-    // Pour toutes les entités à supprimer
-    for(let i in entites_a_supprimer) {
-        for(let entite in entites_a_supprimer[i]) {
-            //On les supprime
-            liste_entites[i].splice(liste_entites[i].indexOf(entite), 1);
+    //Pour chaque entité de la liste des entités (en partant par la fin)
+    for(let i=liste_entites.length-1; i>=0; i--) {
+        let entite = liste_entites[i];
+        //On met à jour sa position
+        entite.position = nouvellePosition(nb_lignes, nb_colonnes, entite);
+        //On met à jour ses stats
+        [entite.hydratation, entite.satiete, entite.abstinence] = getNewStats(entite, liste_terrain);
+        //Si elle doit mourir
+        if(entite.hydratation<=0 || entite.satiete<=0) {
+            //On l'enlève de la liste des entités. C'est pour ça que l'on parcourt la liste à l'envers (si on enlève des éléments de la liste en la parcourant à l'endroit, il risque d'y avoir des problèmes).
+            liste_entites.splice(i, 1)
         }
     }
 }
