@@ -18,7 +18,8 @@ var infos = {
     nb_iterations_max: 0,
     nb_lignes: 0,
     nb_colonnes: 0,
-    seed: Math.floor(Math.random()*1000000) //Un entier réellement aléatoire dans [0;99]
+    seed: Math.floor(Math.random()*1000000), //Un entier réellement aléatoire dans [0;999999]
+    debut_partie: 0 //Va permettre aux joueurs de se synchroniser
 }
 
 var infos_privees = {
@@ -53,13 +54,19 @@ io.on("connection", socket => {
             infos.liste_forces.push(borner(infos_client.force, 1, 5));
             infos.liste_perceptions.push(borner(infos_client.perception, 1, 5));
             infos.liste_taux_reproduction.push(borner(infos_client.taux_reproduction, 1, 5)); // À modifier : Il faudra tester que la somme des stats est plus petit ou égale à 9
-            // On renvoie les infos à tout le monde
-            io.emit("infos", infos); 
             
-            // On lui génère un identifiant secret dans [0;999999], on le stocke, et on le lui envoie
+            // On lui génère un identifiant secret dans [0;999999] que l'on stocke et lui renvoie
             let identifiant_secret = Math.floor(Math.random()*1000000)
             infos_privees.identifiants_secrets.push(identifiant_secret)
             socket.emit("identifiant_secret", identifiant_secret); 
+            
+            //Si c'est le dernier joueur à pouvoir entrer, la partie débute maintenant
+            if(infos.liste_joueurs.length==infos.nb_joueurs_max) {
+                infos.debut_partie = Date.now();
+            }
+            
+            // On renvoie les infos à tout le monde
+            io.emit("infos", infos);
         }
     });
 });
