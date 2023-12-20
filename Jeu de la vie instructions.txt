@@ -27,3 +27,27 @@ Fait :
     - Un joueur pourra déplacer un hexagone prairie ou eau avec un hexagone rocher (pendant l'évolution)
     - Il y a autant de petits que le taux de reproduction
     - Le nombre de tours est choisi par le premier joueur
+
+Fonction bouger_entites(liste_entites):
+    pour chaque entite de trierParForceDecroissante(liste_entites):
+        bouger(entite)
+
+Fonction bouger(entite, i=0):
+    si mouvement(entite, i) est un mur ou une entité strictement plus forte ou une tanière adverse
+        bouger(entite, i+1)
+    sinon
+        si movement(entite, i) est entité strictement plus faible
+            bouger(entite_plus_faible, 0)
+        
+        si mouvement(entite, i) est libre
+            entite.position = mouvement(entite, i)
+
+Fonction mouvement(entite, i):
+    si i=0: on renvoie la position que l'entité veut
+    si i=1: on renvoie la position haut-gauche
+    si i=2: on renvoie la position haut-droite
+    si i=3: on renvoie la position droite
+    si i=4: on renvoie la position bas-droite
+    si i=5: on renvoie la position bas-gauche
+    si i=6: on renvoie la position gauche
+    si i=7: on renvoie la position entite.position
