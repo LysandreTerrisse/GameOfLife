@@ -49,7 +49,7 @@ function genererTerrain(nb_joueurs_max, nb_lignes, nb_colonnes) {
     return liste_terrain;
 }
 
-function genererEntites(nb_joueurs_max, nb_entites_par_joueur, liste_forces, liste_perceptions, liste_taux_reproduction, nb_lignes, nb_colonnes) {
+function genererEntites(nb_joueurs_max, nb_entites_par_joueur, liste_forces, liste_perceptions, liste_taux_reproduction, nb_sexes, nb_lignes, nb_colonnes) {
     let liste_entites = []
     for(let i=0; i<nb_joueurs_max; i++) {
         for(let j=0; j<nb_entites_par_joueur; j++) {
@@ -59,10 +59,11 @@ function genererEntites(nb_joueurs_max, nb_entites_par_joueur, liste_forces, lis
                 satiete: 5,
                 hydratation: 5,
                 abstinence: 0,
-                sexe: randint(0, 1),
+                sexe: randint(0, nb_sexes-1),
                 force: liste_forces[i],
                 perception: liste_perceptions[i],
-                taux_reproduction: liste_taux_reproduction[i]
+                taux_reproduction: liste_taux_reproduction[i],
+                nb_sexes: nb_sexes
             });
         }
     }
@@ -96,7 +97,7 @@ function getNewStats(entite, liste_terrain) {
 function boucle(debut_partie, liste_entites, liste_terrain, nb_iterations_max, iteration=1) {
     //On attend un certain temps avant de lancer le tick et de le dessiner
     //S'il y a du retard, on attend moins longtemps pour rattraper ce retard.
-    let temps_a_attendre = (debut_partie + (1000 * iteration)) - Date.now(); 
+    let temps_a_attendre = (debut_partie + (100 * iteration)) - Date.now(); 
     
     //Si on est en retard d'au moins un tick, on appelle setTimeout une fois sur 1000 pour éviter les erreurs de récursion.
     //(On appelle setTimeout le moins que possible car cela fait perdre au moins 4ms, même en donnant un nombre négatif)
@@ -112,11 +113,35 @@ function boucle(debut_partie, liste_entites, liste_terrain, nb_iterations_max, i
         tick(liste_entites, liste_terrain);
         if(iteration!=nb_iterations_max) {
             boucle(debut_partie, liste_entites, liste_terrain, nb_iterations_max, iteration + 1)
+        } else {
+            dessiner(liste_terrain, liste_entites, 10, 30);
         }
     }
 }
 
-function tick(liste_entites, liste_terrain) {
+function moyenne(a, b) {
+    return Math.floor((a + b)/2);
+}
+
+function faireBebes(entite1, entite2, nb_sexes) {
+    entite1.abstinence = 0;
+    entite2.abstinence = 0;
+    for(let k=0; k<entite1.taux_reproduction; k++) {
+        liste_entites.push({
+            tribu: entite1.tribu,
+            position: entite1.position,
+            satiete: 5,
+            hydratation: 5,
+            abstinence: 0,
+            sexe: randint(0, nb_sexes-1),
+            force: entite1.force,
+            perception: entite1.perception,
+            taux_reproduction: entite1.taux_reproduction
+        });
+    }
+}
+
+function tick(liste_entites, liste_terrain, nb_joueurs, nb_sexes) {
     let [nb_lignes, nb_colonnes] = [liste_terrain.length, liste_terrain[0].length];
     
     //On bouge toutes les entités
@@ -131,6 +156,32 @@ function tick(liste_entites, liste_terrain) {
         if(entite.hydratation<=0 || entite.satiete<=0) {
             //On l'enlève de la liste des entités. C'est pour ça que l'on parcourt la liste à l'envers (si on enlève des éléments de la liste en la parcourant à l'endroit, il risque d'y avoir des problèmes).
             liste_entites.splice(i, 1)
+        }
+    }
+    
+
+    //On crée une liste d'entités classées selon leur tanières (si elles sont dans leur tanière)
+    tanieres = Array(nb_joueurs)
+    for(let i in tanieres) {tanieres[i] = [];}
+    for(let entite of liste_entites) {
+        if(getTypeTuile(liste_terrain, entite.position) <= 3) {
+            tanieres[entite.tribu].push(entite);        
+        }
+    }
+    
+    //Pour chaque tanière
+    for(let taniere of tanieres) {
+        //Pour chaque paire d'entités
+        for(let i=0; i<taniere.length; i++) {
+            let entite1 = taniere[i];
+            for(let j=i+1; j<taniere.length; j++) {
+                let entite2 = taniere[j];
+                //Si elles sont de sexe différent et qu'elles ont toutes les deux un taux d'abstinence supérieur ou égal à 5
+                if(entite1.sexe != entite2.sexe && entite1.abstinence >= 5 && entite2.abstinence >= 5) {
+                    //Elles font des bébés
+                    faireBebes(entite1, entite2, nb_sexes);
+                }
+            }
         }
     }
 }
