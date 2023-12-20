@@ -90,3 +90,7 @@ app.get("/fonctions_interface.js", function(request, response) {
 app.get("/fonctions_aleatoire.js", function(request, response) {
     response.sendFile("fonctions_aleatoire.js", {root: __dirname});
 });
+
+app.get("/fonctions_de_collisions.js", function(request, response) {
+    response.sendFile("fonctions_de_collisions.js", {root: __dirname});
+});
