@@ -97,3 +97,7 @@ app.get("/fonctions_aleatoire.js", function(request, response) {
 app.get("/fonctions_de_collisions.js", function(request, response) {
     response.sendFile("fonctions_de_collisions.js", {root: __dirname});
 });
+
+app.get("/fonctions_de_choix.js", function(request, response) {
+    response.sendFile("fonctions_de_choix.js", {root: __dirname});
+});
