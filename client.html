@@ -33,7 +33,7 @@
             //Si l'on n'avait pas encore généré puis affiché le terrain, on le fait
             if(liste_terrain.length==0) {
                 liste_terrain = genererTerrain(infos.nb_joueurs_max, infos.nb_lignes, infos.nb_colonnes);
-                liste_entites = genererEntites(infos.nb_joueurs_max, infos.nb_entites_par_joueur, infos.liste_forces, infos.liste_perceptions, infos.liste_taux_reproduction, infos.nb_lignes, infos.nb_colonnes)
+                liste_entites = genererEntites(infos.nb_joueurs_max, infos.nb_entites_par_joueur, infos.liste_forces, infos.liste_perceptions, infos.liste_taux_reproduction, infos.nb_sexes, infos.nb_lignes, infos.nb_colonnes)
                 dessinerPremiereFois(liste_terrain, liste_entites, 10, 30);
             }
             
@@ -55,7 +55,7 @@
         // On enlève les inputs de connexion
         enleverInputsDeConnexion();
         // On extrait les informations des champs
-        let [nom_joueur, force, perception, taux_reproduction, nb_joueurs, nb_entites_par_joueur, nb_iterations, nb_lignes, nb_colonnes] = extraireDepuisInterface();
+        let [nom_joueur, force, perception, taux_reproduction, nb_joueurs, nb_entites_par_joueur, nb_iterations, nb_sexes, nb_lignes, nb_colonnes] = extraireDepuisInterface();
         // On affiche le nom du joueur
         document.getElementById("paragraphe_nom_joueur").innerHTML = nom_joueur;
 
@@ -68,6 +68,7 @@
             nb_joueurs_max: nb_joueurs,
             nb_entites_par_joueur: nb_entites_par_joueur,
             nb_iterations_max: nb_iterations,
+            nb_sexes: nb_sexes,
             nb_lignes: nb_lignes,
             nb_colonnes: nb_colonnes
         }
@@ -79,13 +80,10 @@
     /*
     
     Il ne reste plus qu'à :
-    - Faire en sorte que les entités puissent se reproduire dans la tanière
-    
     - Faire un algorithme de plus court chemin
     - Implémenter le paramètre "vision à distance"
     - Implémenter un algorithme de choix
     - Implémenter le système de points
-    - Implémenter plus de deux sexes
     - Empêcher l'appui de boutons lorsque paramètres invalides
     */
     </script>
@@ -105,6 +103,7 @@
             Nombre de joueurs : <input type="number" id="champ_nb_joueurs" /></br>
             Nombre d'entités par joueur : <input type="number" id="champ_nb_entites_par_joueur" /></br>
             Nombre d'itérations : <input type="number" id="champ_nb_iterations" /></br>
+            Nombre de sexes : <input type="number" id="champ_nb_sexes" /></br>
             Nombre de lignes : <input type="number" id="champ_nb_lignes" /></br>
             Nombre de colonnes : <input type="number" id="champ_nb_colonnes" /></br>
         </div>
