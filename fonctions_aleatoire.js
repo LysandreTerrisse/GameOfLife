@@ -1,5 +1,3 @@
-// Technique trouvée sur 
-
 var seed;
 
 //Cette fonction vient du site https://svijaykoushik.github.io/blog/2019/10/04/three-awesome-ways-to-generate-random-number-in-javascript/
