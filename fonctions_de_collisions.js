@@ -33,7 +33,7 @@ Les propriétés intéressantes sont :
     - Si on a trois entités A, B, et C, que A veut aller vers B, que B veut aller vers C, et que C veut aller vers A, alors soit aucune ne bouge, soit l'une d'elles se fait gerter et les deux autres avancent correctement.
     - L'algorithme se termine car on répète récursivement sur une autre entité strictement plus faible, ou on répète récursivement jusqu'à ce que i=7.
     - Si deux entités veulent aller à une même position, l'entité la plus forte passe en premier
-    - Les entités ne peuvent pas aller dans la tanière des autres tribu, mais peuvent aller dans leur tanière à plusieurs
+    - Les entités ne peuvent accéder qu'à leurs tanières
 */
 
 
@@ -69,11 +69,6 @@ function estEntiteAuMoinsAussiForte(position, entite, matrice_entites) {
     return (matrice_entites[position[0]][position[1]] !== 0) && (matrice_entites[position[0]][position[1]].force >= entite.force);
 }
 
-/* Cette fonction est en temps constant grâce à la matrice des entités
-function estEntitePlusFaible(position, entite, matrice_entites) {
-    return (matrice_entites[position[0]][position[1]] !== 0) && (matrice_entites[position[0]][position[1]].force < entite.force);
-}
-*/
 function estTaniereAdverse(position, entite, liste_terrain) {
     return (liste_terrain[position[0]][position[1]] <= 3) && (liste_terrain[position[0]][position[1]] != entite.tribu);
 }
