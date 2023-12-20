@@ -15,9 +15,10 @@ function extraireDepuisInterface() {
     let nb_joueurs            = Number(document.getElementById("champ_nb_joueurs"           ).value);
     let nb_entites_par_joueur = Number(document.getElementById("champ_nb_entites_par_joueur").value);
     let nb_iterations         = Number(document.getElementById("champ_nb_iterations"        ).value);
+    let nb_sexes              = Number(document.getElementById("champ_nb_sexes"             ).value);
     let nb_lignes             = Number(document.getElementById("champ_nb_lignes"            ).value);
     let nb_colonnes           = Number(document.getElementById("champ_nb_colonnes"          ).value);
-    return [nom_joueur, force, perception, taux_reproduction, nb_joueurs, nb_entites_par_joueur, nb_iterations, nb_lignes, nb_colonnes];
+    return [nom_joueur, force, perception, taux_reproduction, nb_joueurs, nb_entites_par_joueur, nb_iterations, nb_sexes, nb_lignes, nb_colonnes];
 }
 
 /* S'exécute quand l'un des input de type range change */
