@@ -85,9 +85,9 @@ function nouvellePosition(nb_lignes, nb_colonnes, entite) {
         case "TOP-LEFT": i--; break;
         case "TOP-RIGHT": j++; i--; break;
         case "LEFT": j--; break;
-        case "RIGHT": i++; break;
+        case "RIGHT": j++; break;
         case "BOTTOM-LEFT": j--; i++; break;
-        case "BOTTOM-RIGHT": i++;
+        case "BOTTOM-RIGHT": i++; break
     }
 
     //On borne la position pour qu'elle soit comprise dans le terrain.
@@ -114,45 +114,65 @@ function getNewStats(entite, liste_terrain) {
 }
 
 
-/* Se répète à chaque seconde dès que l'on a suffisamment de joueurs. */
-function tick(liste_entites, liste_terrain, nb_iterations) {
+/* Boucle principale qui se répète à chaque seconde dès que l'on a suffisamment de joueurs. */
+/* Cette boucle "rattrape son retard" en cas de lag. Elle commence à l'itération 1.         */
+/* ATTENTION : Sur certains navigateurs (Edge), les setTimeout et setInterval deviennent    */
+/* paresseux au bout de quelques secondes, et n'itèrent plus qu'une fois par seconde. Cela  */
+/* n'arrive pas sur Firefox, qui devient paresseux seulement quand la page est cachée (ce   */
+/* qui ne gène pas car la boucle rattrape un retard d'une heure en moins de deux secondes). */
+function boucle(debut_partie, liste_entites, liste_terrain, nb_iterations_max, iteration=1) {
+    //On attend un certain temps avant de lancer le tick et de le dessiner
+    //S'il y a du retard, on attend moins longtemps pour rattraper ce retard.
+    let temps_a_attendre = (debut_partie + (100 * iteration)) - Date.now(); 
+    
+    
+    //Si on est en retard d'au moins un tick, on appelle setTimeout une fois sur 1000 pour éviter les erreurs de récursion.
+    //(On appelle setTimeout le moins que possible car cela fait perdre au moins 4ms, même en donnant un nombre négatif)
+    if(temps_a_attendre > 0 || (iteration % 1000 == 0)) {
+        setTimeout(() => {
+            tick(liste_entites, liste_terrain);
+            dessiner(liste_terrain, liste_entites, 10, 30);
+            if(iteration!=nb_iterations_max) {
+                boucle(debut_partie, liste_entites, liste_terrain, nb_iterations_max, iteration + 1)
+            }
+        }, temps_a_attendre);
+    } else {
+        tick(liste_entites, liste_terrain);
+        if(iteration!=nb_iterations_max) {
+            boucle(debut_partie, liste_entites, liste_terrain, nb_iterations_max, iteration + 1)
+        }
+    }
+}
+
+function tick(liste_entites, liste_terrain) {
     let [nb_lignes, nb_colonnes] = [liste_terrain.length, liste_terrain[0].length];
-    setTimeout(() => {
-        entites_a_supprimer = []
-        //Pour chaque tribu
-        for(let i in liste_entites) {
-            let tribu = liste_entites[i];
-            entites_a_supprimer[i] = []
-            //Pour chaque entité
-            for(let entite of tribu) {
-                //On met à jour sa position
-                entite.position = nouvellePosition(nb_lignes, nb_colonnes, entite);
-                //On met à jour ses stats
-                [entite.hydratation, entite.satiete, entite.abstinence] = getNewStats(entite, liste_terrain);
-                //Si elle doit mourir
-                if(entite.hydratation<=0 || entite.satiete<=0) {
-                    //On la stocke dans les entités à supprimer
-                    entites_a_supprimer[i].push(entite)
-                }
+    
+    entites_a_supprimer = []
+    //Pour chaque tribu
+    for(let i in liste_entites) {
+        let tribu = liste_entites[i];
+        entites_a_supprimer[i] = []
+        //Pour chaque entité
+        for(let entite of tribu) {
+            //On met à jour sa position
+            entite.position = nouvellePosition(nb_lignes, nb_colonnes, entite);
+            //On met à jour ses stats
+            [entite.hydratation, entite.satiete, entite.abstinence] = getNewStats(entite, liste_terrain);
+            //Si elle doit mourir
+            if(entite.hydratation<=0 || entite.satiete<=0) {
+                //On la stocke dans les entités à supprimer
+                //entites_a_supprimer[i].push(entite)
             }
         }
-        
-        // Pour toutes les entités à supprimer
-        for(let i in entites_a_supprimer) {
-            for(let entite in entites_a_supprimer[i]) {
-                //On les supprime
-                liste_entites[i].splice(liste_entites[i].indexOf(entite), 1);
-            }
+    }
+    
+    // Pour toutes les entités à supprimer
+    for(let i in entites_a_supprimer) {
+        for(let entite in entites_a_supprimer[i]) {
+            //On les supprime
+            liste_entites[i].splice(liste_entites[i].indexOf(entite), 1);
         }
-        
-        //On dessine
-        dessiner(liste_terrain, liste_entites, 10, 30);
-        
-        //Si la partie doit continuer, on la continue
-        if(nb_iterations>1) {
-            tick(liste_entites, liste_terrain, nb_iterations)
-        }
-    }, 100);
+    }
 }
 
 console.log("test");
