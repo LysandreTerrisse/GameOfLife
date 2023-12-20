@@ -124,6 +124,7 @@ function moyenne(a, b) {
 }
 
 function faireBebes(entite1, entite2, nb_sexes) {
+    console.log("babybel")
     entite1.abstinence = 0;
     entite2.abstinence = 0;
     for(let k=0; k<entite1.taux_reproduction; k++) {
