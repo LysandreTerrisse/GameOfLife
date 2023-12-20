@@ -38,7 +38,7 @@
             
             // Si l'on a le bon nombre de joueurs
             if(infos.liste_joueurs.length == infos.nb_joueurs_max) {
-                tick(liste_entites, liste_terrain, infos.nb_iterations_max)// On commence la partie en répétant tick(liste_terrain, liste_entites, nb_joueurs, nb_iterations_max) toutes les 1000ms
+                boucle(infos.debut_partie, liste_entites, liste_terrain, infos.nb_iterations_max)// On commence la partie
             }
         }
     });
