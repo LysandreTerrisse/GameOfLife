@@ -22,6 +22,7 @@ Fait :
 À faire :
     - Le gagnant est celui qui a le plus de créatures
     - Chaque joueur doit répartir 9 points sur trois axes entre 1 et 5
+    - Les créatures utiliseront leur vision pour se diriger vers la tanière.
         - Taux de reproduction
         - Perception (repérer à distance les ressources)
         - Force (conserver/occuper une case convoitée/occupée par une créature d'une autre espèce)
