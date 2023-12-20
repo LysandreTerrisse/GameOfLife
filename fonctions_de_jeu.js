@@ -1,5 +1,3 @@
-//var {dessiner} = require("./fonctions_de_dessin")
-
 /* Permute deux cases d'une matrice */
 function permuter(matrice, pos1, pos2) {
     let [i1, j1] = pos1, [i2, j2] = pos2;
@@ -72,39 +70,6 @@ function genererEntites(nb_joueurs_max, nb_entites_par_joueur, liste_forces, lis
     return liste_entites;
 }
 
-/* Cette fonction prend une entité et un terrain, et renvoie la position où l'entité choisit d'aller */
-function nouvellePosition(nb_lignes, nb_colonnes, entite) {
-    // On récupère la position de l'entité
-    let [i, j] = entite.position;
-
-    // Cette opération doit être déterministe (n'inclut pas d'aléatoire)
-    //Pour l'instant, l'entité va en haut à droite
-    let choix = ["TOP-LEFT", "TOP-RIGHT", "LEFT", "RIGHT", "BOTTOM-LEFT", "BOTTOM-RIGHT", "STAND-STILL"][randint(0, 6)];
-
-    switch(choix) {
-        case "TOP-LEFT": i--; break;
-        case "TOP-RIGHT": j++; i--; break;
-        case "LEFT": j--; break;
-        case "RIGHT": j++; break;
-        case "BOTTOM-LEFT": j--; i++; break;
-        case "BOTTOM-RIGHT": i++; break
-    }
-
-    //On borne la position pour qu'elle soit comprise dans le terrain.
-    i = borner(i, 0, nb_lignes-1);
-    j = borner(j, 0, nb_lignes-1);
-    
-    return [i, j]
-}
-
-/* Prend une liste de tribus contenant des entités, et renvoie une matrice de */
-/* même taille que le terrain contenant les entités aux bons emplacements.    */
-/*function getMatriceEntites(liste_terrain, liste_entites) {
-    for(let tribu of liste_entites)
-}*/
-
-
-
 function getTypeTuile(entite, liste_terrain) {
     return liste_terrain[entite.position[0]][entite.position[1]];
 }
@@ -131,7 +96,7 @@ function getNewStats(entite, liste_terrain) {
 function boucle(debut_partie, liste_entites, liste_terrain, nb_iterations_max, iteration=1) {
     //On attend un certain temps avant de lancer le tick et de le dessiner
     //S'il y a du retard, on attend moins longtemps pour rattraper ce retard.
-    let temps_a_attendre = (debut_partie + (100 * iteration)) - Date.now(); 
+    let temps_a_attendre = (debut_partie + (1000 * iteration)) - Date.now(); 
     
     
     //Si on est en retard d'au moins un tick, on appelle setTimeout une fois sur 1000 pour éviter les erreurs de récursion.
@@ -155,19 +120,18 @@ function boucle(debut_partie, liste_entites, liste_terrain, nb_iterations_max, i
 function tick(liste_entites, liste_terrain) {
     let [nb_lignes, nb_colonnes] = [liste_terrain.length, liste_terrain[0].length];
     
+    //On bouge toutes les entités
+    bougerEntites(liste_entites, liste_terrain);
+
     //Pour chaque entité de la liste des entités (en partant par la fin)
     for(let i=liste_entites.length-1; i>=0; i--) {
         let entite = liste_entites[i];
-        //On met à jour sa position
-        entite.position = nouvellePosition(nb_lignes, nb_colonnes, entite);
         //On met à jour ses stats
         [entite.hydratation, entite.satiete, entite.abstinence] = getNewStats(entite, liste_terrain);
         //Si elle doit mourir
         if(entite.hydratation<=0 || entite.satiete<=0) {
             //On l'enlève de la liste des entités. C'est pour ça que l'on parcourt la liste à l'envers (si on enlève des éléments de la liste en la parcourant à l'endroit, il risque d'y avoir des problèmes).
-            liste_entites.splice(i, 1)
+            //liste_entites.splice(i, 1)
         }
     }
 }
-
-console.log("test");
