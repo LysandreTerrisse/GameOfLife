@@ -83,15 +83,13 @@ function dessinerTerrain(liste_terrain, rayon) {
 
 /* Dessine uniquement les entités (sans effacer) */
 function dessinerEntites(liste_entites, rayon, rayon_tuiles) {
-    for(let i=0; i<liste_entites.length; i++) { // Pour chaque tribu
-        for(let j in liste_entites[i]) { // Pour chaque entité
-            d3.select("svg")
-            .append("path")
-            .attr("d", hexagoneSerialise(rayon, rayon_tuiles, liste_entites[i][j].position))
-            .attr("stroke", "white")
-            .attr("fill", getCouleur(i))
-            .attr("id", "e" + i + "-" + j); // e pour "entité"
-        }
+    for(let i in liste_entites) { // Pour chaque entité
+        d3.select("svg")
+        .append("path")
+        .attr("d", hexagoneSerialise(rayon, rayon_tuiles, liste_entites[i].position))
+        .attr("stroke", "white")
+        .attr("fill", getCouleur(i))
+        .attr("id", "e" + i); // e pour "entité"
     }
 }
 
