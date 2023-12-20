@@ -52,10 +52,11 @@ io.on("connection", socket => {
         if(infos.liste_joueurs.length!=infos.nb_joueurs_max) {
             // Alors on l'ajoute à la liste des joueurs
             infos.liste_joueurs.push(infos_client.nom_joueur);
-            //On stocke les trois statistiques qu'il a donné pour ses entités
+            //On stocke les trois statistiques qu'il a donné pour ses entités, tout en faisant en sorte que la somme des points distribués n'est pas plus grande que 9
+            let n = infos.liste_joueurs.length
             infos.liste_forces.push(borner(infos_client.force, 1, 5));
-            infos.liste_perceptions.push(borner(infos_client.perception, 1, 5));
-            infos.liste_taux_reproduction.push(borner(infos_client.taux_reproduction, 1, 5)); // À modifier : Il faudra tester que la somme des stats est plus petit ou égale à 9
+            infos.liste_perceptions.push(borner(infos_client.perception, 1, Math.min(5, 8 - infos.liste_forces[n-1])));
+            infos.liste_taux_reproduction.push(borner(infos_client.taux_reproduction, 1, Math.min(5, 9 - infos.liste_forces[n-1] - infos.liste_perceptions[n-1])));
             
             // On lui génère un identifiant secret dans [0;999999] que l'on stocke et lui renvoie
             let identifiant_secret = Math.floor(Math.random()*1000000)
