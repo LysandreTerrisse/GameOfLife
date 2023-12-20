@@ -70,13 +70,13 @@ function genererEntites(nb_joueurs_max, nb_entites_par_joueur, liste_forces, lis
     return liste_entites;
 }
 
-function getTypeTuile(entite, liste_terrain) {
-    return liste_terrain[entite.position[0]][entite.position[1]];
+function getTypeTuile(liste_terrain, position) {
+    return liste_terrain[position[0]][position[1]];
 }
 
 function getNewStats(entite, liste_terrain) {
     //On change les stats selon le type de la tuile
-    let typeTuile = getTypeTuile(entite, liste_terrain);
+    let typeTuile = getTypeTuile(liste_terrain, entite.position);
     
     //Dans tous les cas, on diminue l'hydratation et la satiété de 0.5, et on augmente le taux d'abstinence de 1
     let hydratation = borner(entite.hydratation - 0.5 + (typeTuile=="E" ? 3 : 0), 0, 10);
@@ -97,7 +97,6 @@ function boucle(debut_partie, liste_entites, liste_terrain, nb_iterations_max, i
     //On attend un certain temps avant de lancer le tick et de le dessiner
     //S'il y a du retard, on attend moins longtemps pour rattraper ce retard.
     let temps_a_attendre = (debut_partie + (1000 * iteration)) - Date.now(); 
-    
     
     //Si on est en retard d'au moins un tick, on appelle setTimeout une fois sur 1000 pour éviter les erreurs de récursion.
     //(On appelle setTimeout le moins que possible car cela fait perdre au moins 4ms, même en donnant un nombre négatif)
@@ -131,7 +130,7 @@ function tick(liste_entites, liste_terrain) {
         //Si elle doit mourir
         if(entite.hydratation<=0 || entite.satiete<=0) {
             //On l'enlève de la liste des entités. C'est pour ça que l'on parcourt la liste à l'envers (si on enlève des éléments de la liste en la parcourant à l'endroit, il risque d'y avoir des problèmes).
-            //liste_entites.splice(i, 1)
+            liste_entites.splice(i, 1)
         }
     }
 }
