@@ -7,6 +7,7 @@
     <script src="./fonctions_de_dessin.js"></script>
     <script src="./fonctions_interface.js"></script>
     <script src="./fonctions_aleatoire.js"></script>
+    <script src="./fonctions_de_collisions.js"></script>
     <script>
     //var {genererTerrain, genererEntites, tick} = require("./fonctions_de_jeu");
     //var {enleverInputsCreationPartie, enleverInputsDeConnexion} = require("./fonctions_de_dessin");
@@ -78,11 +79,8 @@
     /*
     
     Il ne reste plus qu'à :
-    - Empêcher les entités d'entrer dans les tanière adverses
     - Faire en sorte que les entités puissent se reproduire dans la tanière
     
-    - Faire en sorte que les entités ne peuvent pas se traverser sauf dans la tanière (on peut faire ça avec un algorithme efficace en faisant une liste_positions_prises)
-    - Implémenter le système de pouvoir pousser les autres entités
     - Faire un algorithme de plus court chemin
     - Implémenter le paramètre "vision à distance"
     - Implémenter un algorithme de choix
