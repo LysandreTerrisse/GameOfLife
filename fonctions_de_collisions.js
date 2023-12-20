@@ -70,7 +70,7 @@ function estEntiteAuMoinsAussiForte(position, entite, matrice_entites) {
 }
 
 function estTaniereAdverse(position, entite, liste_terrain) {
-    return (liste_terrain[position[0]][position[1]] <= 3) && (liste_terrain[position[0]][position[1]] != entite.tribu);
+    return (getTypeTuile(liste_terrain, position) <= 3) && (getTypeTuile(liste_terrain, position) != entite.tribu);
 }
 
 function deplacer(entite, position, matrice_entites) {
@@ -100,7 +100,7 @@ function bougerEntites(liste_entites, liste_terrain) {
 }
 
 function bouger(entite, liste_terrain, matrice_entites, i=0) {
-    mvmt = mouvement(entite, i);
+    mvmt = mouvement(entite, liste_terrain, i);
     
     //Si l'entité essaie d'aller à sa tanière ou de rester à sa place
     if(mvmt == getPosTaniere(entite.tribu) || (mvmt[0] == entite.position[0] && mvmt[1] == entite.position[1])) {
@@ -128,14 +128,13 @@ function bouger(entite, liste_terrain, matrice_entites, i=0) {
     }
 }
 
-function mouvement(entite, choix) {
+function mouvement(entite, liste_terrain, k) {
     // On récupère la position de l'entité
     let [i, j] = entite.position;
-    
-    //Si choix=0, l'entité fait un choix (pour l'instant, c'est randint(1, 6))
-    if(choix==0) { choix = randint(1, 6); }
+    //Si k=0, l'entité fait un choix
+    k = (k==0) ? choix(entite, liste_terrain) : k;
 
-    switch(choix) {
+    switch(k) {
         case 1: return [i-1, j  ] //Haut-gauche
         case 2: return [i-1, j+1] //Haut-droite
         case 3: return [i  , j+1] //Droite
@@ -145,3 +144,25 @@ function mouvement(entite, choix) {
         case 7: return [i  , j  ] //La même position
     }
 }
+
+/* L'algorithme de décision de l'entité. */
+function choix(entite, liste_terrain) {
+    //Si l'entité est dans une tanière
+    if(getTypeTuile(liste_terrain, entite.position) <= 3) {
+        //Si elle n'est sur le point de mourir
+        if(entite.satiete >= 4 && entite.hydratation >= 4) {
+            //Elle reste
+            return 7;
+        //Sinon
+        } else {
+            //Elle fait ce qu'elle veut
+            return randint(1, 7);
+        }
+    } else {
+        return randint(1, 7);
+    }
+}
+
+
+
+
