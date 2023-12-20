@@ -16,6 +16,7 @@ var infos = {
     nb_joueurs_max: 0,
     nb_entites_par_joueur: 0,
     nb_iterations_max: 0,
+    nb_sexes: 0,
     nb_lignes: 0,
     nb_colonnes: 0,
     seed: Math.floor(Math.random()*1000000), //Un entier réellement aléatoire dans [0;999999]
@@ -41,7 +42,8 @@ io.on("connection", socket => {
         if(infos.liste_joueurs.length == 0) { // Si c'est le premier utilisateur à vouloir jouer
             infos.nb_joueurs_max        = borner(infos_client.nb_joueurs_max, 1, 4); // Alors il nous a aussi envoyé un nombre de joueurs max
             infos.nb_entites_par_joueur = borner(infos_client.nb_entites_par_joueur, 1, 200); // Et un nombre d'entités par joueur
-            infos.nb_iterations_max     = Math.max(infos_client.nb_iterations_max, 10); // Et un nombre d'itérations maximal
+            infos.nb_iterations_max     = borner(infos_client.nb_iterations_max, 10, 10000000); // Et un nombre d'itérations maximal
+            infos.nb_sexes              = borner(infos_client.nb_sexes, 2, 30) // Et un nombre de sexes
             infos.nb_lignes             = borner(infos_client.nb_lignes, 3, 50); // Et un nombre de lignes
             infos.nb_colonnes           = borner(infos_client.nb_colonnes, 3, 50); // Et un nombre de colonnes
         }
