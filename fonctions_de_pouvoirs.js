@@ -78,7 +78,7 @@ function executerAction(action, liste_terrain, liste_entites, liste_scores) {
         case (pouvoir==3 && score >= 100) : VisionEnsemble(liste_entites, numero_utilisateur); break;
         case (pouvoir==4 && score >= 130) : ItsAHoax(liste_terrain); break;
         case (pouvoir==5 && score >= 200) : DesormaisIneluctable(liste_entites, numero_utilisateur); break;
-        case (pouvoir==6 && score >= 100) : TheSuperintelligentWill(liste_entites); break;
+        case (pouvoir==6 && score >= 500) : TheSuperintelligentWill(liste_entites); break;
     }
     dessinerTout(liste_terrain, liste_entites, 10, 30)
 }
