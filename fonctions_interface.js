@@ -33,6 +33,3 @@ function updateStats() {
     document.getElementById("paragraphe_taux_reproduction").innerHTML = taux_reproduction;
     
 }
-
-
-//module.exports = {enleverInputsCreationPartie, enleverInputsDeConnexion};
