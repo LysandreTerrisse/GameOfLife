@@ -82,7 +82,7 @@ function choix(entite, liste_terrain) {
 
         //Par ordre de priorité, elle cherche la ressource, et si elle la trouve, elle y va.
         for(let ressource of priorite) {
-            let pos_ressource = chercherAutour(entite, ressource, liste_terrain, 100);
+            let pos_ressource = chercherAutour(entite, ressource, liste_terrain, entite.intelligence);
             if(pos_ressource !== null) {
                 return allerVers(pos_ressource, entite);
             }
