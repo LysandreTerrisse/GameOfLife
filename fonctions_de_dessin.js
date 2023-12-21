@@ -81,16 +81,25 @@ function dessinerTerrain(liste_terrain, rayon) {
 }
 
 
-/* Dessine uniquement les entités (sans effacer) */
+/* Dessine uniquement les entités (sans effacer). Si deux entités sont à la même */
+/* position (possible seulement dans une tanière), on ne dessine qu'un hexagone. */
 function dessinerEntites(liste_entites, rayon, rayon_tuiles) {
-    for(let i in liste_entites) { // Pour chaque entité
+    //On crée une liste contenant au plus une entité par position
+    let liste_entites_disjointes = [];
+    for(let entite1 of liste_entites) {
+        let position_est_unique = liste_entites_disjointes.every((entite2) => { return entite1.position[0] != entite2.position[0] || entite1.position[1] != entite2.position[1]; });
+        if(position_est_unique) {
+            liste_entites_disjointes.push(entite1);
+            
+        }
+    }
+    
+    for(let i in liste_entites_disjointes) {
         d3.select("svg")
         .append("path")
-        .attr("d", hexagoneSerialise(rayon, rayon_tuiles, liste_entites[i].position))
+        .attr("d", hexagoneSerialise(rayon, rayon_tuiles, liste_entites_disjointes[i].position))
         .attr("stroke", "white")
-        .attr("fill", getCouleur(liste_entites[i].tribu))
+        .attr("fill", getCouleur(liste_entites_disjointes[i].tribu))
         .attr("id", "e" + i); // e pour "entité"
     }
 }
-
-//module.exports = {dessiner};
