@@ -15,8 +15,8 @@ function randint(a, b) {
     return a + Math.floor(nextRandom() * (b-a+1))
 }
 
-function setSeed(newseed) {
-    seed = newseed;
+function setSeed(new_seed) {
+    seed = new_seed;
 }
 
 function getSeed() {
