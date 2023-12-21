@@ -31,16 +31,12 @@
             enleverInputsCreationPartie(); // On enlève les éléments spécifiques au premier joueur
             document.getElementById("paragraphe_liste_joueurs").innerHTML = infos.liste_joueurs.join(" "); // On affiche la liste des joueurs
             
-            //Si l'on n'avait pas encore généré puis affiché le terrain, on le fait
-            if(liste_terrain.length==0) {
+            // Si l'on a le bon nombre de joueurs
+            if(infos.liste_joueurs.length == infos.nb_joueurs_max) {
                 liste_terrain = genererTerrain(infos.nb_joueurs_max, infos.nb_lignes, infos.nb_colonnes);
                 liste_entites = genererEntites(infos.nb_joueurs_max, infos.nb_entites_par_joueur, infos.liste_forces, infos.liste_perceptions, infos.liste_taux_reproduction, infos.nb_sexes, infos.nb_lignes, infos.nb_colonnes)
                 dessinerPremiereFois(liste_terrain, liste_entites, 10, 30);
-            }
-            
-            // Si l'on a le bon nombre de joueurs
-            if(infos.liste_joueurs.length == infos.nb_joueurs_max) {
-                boucle(infos.debut_partie, liste_entites, liste_terrain, infos.nb_iterations_max)// On commence la partie
+                boucle(infos.debut_partie, liste_entites, liste_terrain, infos.liste_joueurs.length, infos.nb_sexes, infos.nb_iterations_max)// On commence la partie
             }
         }
     });
