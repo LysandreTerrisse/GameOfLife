@@ -9,16 +9,22 @@
     <script src="./fonctions_aleatoire.js"></script>
     <script src="./fonctions_de_collisions.js"></script>
     <script src="./fonctions_de_choix.js"></script>
+    <script src="./fonctions_de_pouvoirs.js"></script>
     <script>
     //var {genererTerrain, genererEntites, tick} = require("./fonctions_de_jeu");
     //var {enleverInputsCreationPartie, enleverInputsDeConnexion} = require("./fonctions_de_dessin");
     var socket = io();
     
-    var liste_terrain = [];
-    var liste_entites = [];
-    var identifiant_secret = 0;
+    var infos;
     
-    socket.on("infos", (infos) => { // Quand on reçoit les infos du serveur
+    var identifiant_secret;
+
+    function getIdentifiantSecret() {
+        return identifiant_secret;
+    }
+    
+    socket.on("infos", (infos_serveur) => { // Quand on reçoit les infos du serveur
+        infos = infos_serveur;
         console.log(infos);
         //On obtient la graine de génération pseudo-aléatoire du serveur
         if(!isSeedSet()) {
@@ -33,19 +39,30 @@
             
             // Si l'on a le bon nombre de joueurs
             if(infos.liste_joueurs.length == infos.nb_joueurs_max) {
-                liste_terrain = genererTerrain(infos.nb_joueurs_max, infos.nb_lignes, infos.nb_colonnes);
-                liste_entites = genererEntites(infos.nb_joueurs_max, infos.nb_entites_par_joueur, infos.liste_forces, infos.liste_perceptions, infos.liste_taux_reproduction, infos.nb_sexes, infos.nb_lignes, infos.nb_colonnes)
-                dessinerPremiereFois(liste_terrain, liste_entites, 10, 30);
-                boucle(infos.debut_partie, liste_entites, liste_terrain, infos.liste_joueurs.length, infos.nb_sexes, infos.nb_iterations_max)// On commence la partie
+                infos.liste_terrain = genererTerrain(infos.nb_joueurs_max, infos.nb_lignes, infos.nb_colonnes);
+                infos.liste_entites = genererEntites(infos)
+                infos.liste_scores  = Array(infos.liste_joueurs.length).fill(0);
+                dessinerPremiereFois(infos.liste_terrain, infos.liste_entites, 10, 30);
+                boucle(infos)// On commence la partie
             }
         }
     });
     
-    socket.emit('obtenir_infos'); // On demande les infos au serveur
-    
     socket.on("identifiant_secret", (identifiant_secret_obtenu) => { // Quand on reçoit l'identifiant secret
         identifiant_secret = identifiant_secret_obtenu; // On le stocke
     });
+
+    socket.on("action", (action) => {
+        //Si l'action est valide, on l'ajoute dans le flux des actions (je suis dans le flux de l'action !)
+        
+        if(verifierAction(action, infos.nb_lignes, infos.nb_colonnes)) {
+            infos.liste_actions.push(action);
+            console.log("action poussée");
+        }
+    });
+
+
+    socket.emit('obtenir_infos'); // On demande les infos au serveur
     
     /* S'exécute quand on appuie sur le bouton "Jouer" */
     function demanderJoindrePartie() {
@@ -74,15 +91,6 @@
         socket.emit('ajouter_joueur', infos_client);
     }
     
-    /*
-    
-    Il ne reste plus qu'à :
-    - Faire un algorithme de plus court chemin
-    - Implémenter le paramètre "vision à distance"
-    - Implémenter un algorithme de choix
-    - Implémenter le système de points
-    - Empêcher l'appui de boutons lorsque paramètres invalides
-    */
     </script>
 </head>
 <body>
@@ -108,6 +116,7 @@
             <h3>Jeu de la vie</h3>
             Nom du joueur : <a id="paragraphe_nom_joueur"></a> </br>
             Liste des joueurs : <a id="paragraphe_liste_joueurs"></a> </br>
+            Liste des scores : <a id="paragraphe_liste_scores"></a> </br>
         </div>
         
         <input type="button" id="bouton_jouer" onclick="demanderJoindrePartie()" value="Jouer" />
@@ -116,5 +125,15 @@
     
 
     <div id="tablier"></div>
+
+    <div id="pouvoirs">
+        <input type="button" onclick="setPouvoir(0)" id="bouton_total_energies" value="Total Energies (40pts)" /> <a>Faites disparaître une case prairie</a> </br>
+        <input type="button" onclick="setPouvoir(1)" id="bouton_abracadabra" value="Abracadabra (50pts)" /> <a>Appuyez sur un rocher et une eau/prairie pour les échanger</a> </br>
+        <input type="button" onclick="setPouvoir(2)" id="bouton_big_brain_time" value="It's big brain time (100pts)" /> <a>Vos entités évaluent 25 cases en plus avant de faire leur choix</a> </br>        
+        <input type="button" onclick="setPouvoir(3)" id="bouton_vision_ensemble" value="Vision d'ensemble (100pts)" /> <a>Vos entités peuvent voir une case plus loin</a> </br>
+        <input type="button" onclick="setPouvoir(4)" id="bouton_hoax" value="It's a hoax (130pts)" /> <a>Vos entités ignorent le réchauffement climatique et font disparaître la moitié des prairies</a> </br>
+        <input type="button" onclick="setPouvoir(5)" id="bouton_ineluctable" value="Désormais inéluctable (200pts)" /> <a>Vos entités obtiennent un gant d'infinité et font disparaître la moitié des entités adverses</a> </br>
+        <input type="button" onclick="setPouvoir(6)" id="bouton_superintelligence" value="The Superintelligent Will (500pts)" /> <a>Vos entités ignorent les conseils des chercheurs en sécurité de l'IA et développent une superintelligence</a> </br>
+    </div>
 </body>
 </html>
