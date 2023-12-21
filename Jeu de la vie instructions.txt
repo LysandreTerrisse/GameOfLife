@@ -24,11 +24,11 @@ Fait :
         - Force (conserver/occuper une case convoitée/occupée par une créature d'une autre espèce)
     - Les créatures utiliseront leur vision pour se diriger vers la tanière.
     - Dès que le taux d'hydratation et de satiété sont à plus de 6, la créature revient vers sa tanière
+    - Limiter le nombre maximal d'entités par joueur
+    - Faire un score
 
 À faire :
     - Empêcher l'appui de boutons lorsque les paramètres sont invalides
-    - Limiter le nombre maximal d'entités par joueur
-    - Faire un score
     - Un joueur pourra déplacer un hexagone prairie ou eau avec un hexagone rocher (pendant l'évolution)
     - Le gagnant est celui qui a le plus de créatures
     - Faire le CSS
