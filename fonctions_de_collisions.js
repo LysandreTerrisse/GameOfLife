@@ -91,8 +91,8 @@ function bougerEntites(liste_entites, liste_terrain) {
     let matrice_entites = getMatriceEntites(liste_entites, liste_terrain);
     
     //Puisque les entités les plus fortes sont prioritaires, on trie la liste des entités par force décroissante.
-    liste_entites.sort((entite1, entite2) => {return entite1.force - entite2.force;});
-
+    liste_entites.sort((entite1, entite2) => {return entite2.force - entite1.force;});
+    
     for(let entite of liste_entites) {
         bouger(entite, liste_terrain, matrice_entites);
         
@@ -103,7 +103,8 @@ function bouger(entite, liste_terrain, matrice_entites, i=0) {
     let mvmt = mouvement(entite, liste_terrain, i);
     
     //Si l'entité essaie d'aller à sa tanière ou de rester à sa place
-    if(mvmt == getPosTaniere(entite.tribu) || (mvmt[0] == entite.position[0] && mvmt[1] == entite.position[1])) {
+    let pos_taniere = getPosTaniere(entite.tribu, liste_terrain.length, liste_terrain[0].length);
+    if((mvmt[0] == pos_taniere[0] && mvmt[1] == pos_taniere[1]) || (mvmt[0] == entite.position[0] && mvmt[1] == entite.position[1])) {
         //L'entité se déplace
         deplacer(entite, mvmt, matrice_entites);
     
