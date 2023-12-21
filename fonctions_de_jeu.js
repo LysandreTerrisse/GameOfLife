@@ -9,6 +9,11 @@ function borner(valeur, a, b) {
     return Math.min(Math.max(valeur, a), b)
 }
 
+/* Renvoie le max entre la valeur et 0 */
+function ReLU(valeur) {
+    return Math.max(valeur, 0);
+}
+
 /* Renvoie la position [ligne, colonne] de la tanière */
 function getPosTaniere(i, nb_lignes, nb_colonnes) {
     switch(i) {
@@ -49,21 +54,22 @@ function genererTerrain(nb_joueurs_max, nb_lignes, nb_colonnes) {
     return liste_terrain;
 }
 
-function genererEntites(nb_joueurs_max, nb_entites_par_joueur, liste_forces, liste_perceptions, liste_taux_reproduction, nb_sexes, nb_lignes, nb_colonnes) {
+function genererEntites(infos) {
     let liste_entites = []
-    for(let i=0; i<nb_joueurs_max; i++) {
-        for(let j=0; j<nb_entites_par_joueur; j++) {
+    for(let i=0; i<infos.nb_joueurs_max; i++) {
+        for(let j=0; j<infos.nb_entites_par_joueur; j++) {
             liste_entites.push({
                 tribu: i,
-                position: getPosTaniere(i, nb_lignes, nb_colonnes),
+                position: getPosTaniere(i, infos.nb_lignes, infos.nb_colonnes),
                 satiete: 5,
                 hydratation: 5,
                 abstinence: 0,
-                sexe: randint(0, nb_sexes-1),
-                force: liste_forces[i],
-                perception: liste_perceptions[i],
-                taux_reproduction: liste_taux_reproduction[i],
-                nb_sexes: nb_sexes
+                sexe: randint(0, infos.nb_sexes-1),
+                force: infos.liste_forces[i],
+                perception: infos.liste_perceptions[i],
+                taux_reproduction: infos.liste_taux_reproduction[i],
+                nb_sexes: infos.nb_sexes,
+                vient_de_bouger: false
             });
         }
     }
@@ -79,8 +85,8 @@ function getNewStats(entite, liste_terrain) {
     let typeTuile = getTypeTuile(liste_terrain, entite.position);
     
     //Dans tous les cas, on diminue l'hydratation et la satiété de 0.5, et on augmente le taux d'abstinence de 1
-    let hydratation = borner(entite.hydratation - 0.5 + (typeTuile=="E" ? 3 : 0), 0, 10);
-    let satiete     = borner(entite.satiete     - 0.5 + (typeTuile=="P" ? 2 : 0), 0, 10);
+    let hydratation = borner(entite.hydratation - (entite.vient_de_bouger ? 1 : 0.5) + (typeTuile=="E" ? 3 : 0), 0, 10);
+    let satiete     = borner(entite.satiete     - (entite.vient_de_bouger ? 0.5 : 0.25) + (typeTuile=="P" ? 2 : 0), 0, 10);
     let abstinence  = borner(entite.abstinence + 1, 0, 5);
     
     return [hydratation, satiete, abstinence];
@@ -93,26 +99,27 @@ function getNewStats(entite, liste_terrain) {
 /* paresseux au bout de quelques secondes, et n'itèrent plus qu'une fois par seconde. Cela  */
 /* n'arrive pas sur Firefox, qui devient paresseux seulement quand la page est cachée (ce   */
 /* qui ne gène pas car la boucle rattrape un retard d'une heure en moins de deux secondes). */
-function boucle(debut_partie, liste_entites, liste_terrain, nb_joueurs, nb_sexes, nb_iterations_max, iteration=1) {
+function boucle(infos, iteration=1) {
     //On attend un certain temps avant de lancer le tick et de le dessiner
     //S'il y a du retard, on attend moins longtemps pour rattraper ce retard.
-    let temps_a_attendre = (debut_partie + (100 * iteration)) - Date.now();
+    let temps_a_attendre = (infos.debut_partie + (infos.temps_tick * iteration)) - Date.now(); //ATTENTION : Si l'on change 100 par une autre valeur, il faut aussi la modifier sur le serveur dans le socket.on("envoyer_pouvoir")
     //Si on est en retard d'au moins un tick, on appelle setTimeout une fois sur 1000 pour éviter les erreurs de récursion.
     //(On appelle setTimeout le moins que possible car cela fait perdre au moins 4ms, même en donnant un nombre négatif)
     if(temps_a_attendre > 0 || (iteration % 1000 == 0)) {
         setTimeout(() => {
-            tick(liste_entites, liste_terrain, nb_joueurs, nb_sexes);
-            dessiner(liste_terrain, liste_entites, 10, 30);
-            if(iteration!=nb_iterations_max) {
-                boucle(debut_partie, liste_entites, liste_terrain, nb_joueurs, nb_sexes, nb_iterations_max, iteration + 1)
+            tick(infos.liste_terrain, infos.liste_entites, infos.liste_scores, infos.liste_actions, infos.liste_joueurs.length, infos.nb_sexes, iteration);
+            dessinerEntites(infos.liste_entites, 10, 30);
+            document.getElementById("paragraphe_liste_scores").innerHTML = infos.liste_scores.join(" ");
+            if(iteration!=infos.nb_iterations_max) {
+                boucle(infos, iteration + 1)
             }
         }, temps_a_attendre);
     } else {
-        tick(liste_entites, liste_terrain, nb_joueurs, nb_sexes);
-        if(iteration!=nb_iterations_max) {
-            boucle(debut_partie, liste_entites, liste_terrain, nb_joueurs, nb_sexes, nb_iterations_max, iteration + 1)
+        tick(infos.liste_terrain, infos.liste_entites, infos.liste_scores, infos.liste_actions, infos.liste_joueurs.length, infos.nb_sexes, iteration);
+        if(iteration!=infos.nb_iterations_max) {
+            boucle(infos, iteration + 1)
         } else {
-            dessiner(liste_terrain, liste_entites, 10, 30);
+            dessinerEntites(infos.liste_entites, 10, 30);
         }
     }
 }
@@ -121,10 +128,21 @@ function moyenne(a, b) {
     return Math.floor((a + b)/2);
 }
 
-function faireBebes(entite1, entite2, nb_sexes) {
+/* Fait des bébés. Quand on avait initialement programmé cette fonction, le nombre d'entités  */
+/* augmentait exponentiellement, et pouvait dépasser les 100000 en moins d'une centaine       */
+/* d'itérations, faisant crasher la page. Nous avons donc décidé que chaque joueur a au plus  */
+/* 100 entités, mais que son score continue d'augmenter après cela.                           */
+function faireBebes(entite1, entite2, nb_sexes, liste_entites, liste_scores, tailles_tribus) {
+    //On met l'abstinence des entités à 0
     entite1.abstinence = 0;
     entite2.abstinence = 0;
-    for(let k=0; k<entite1.taux_reproduction; k++) {
+    
+    //On calcule le nombre de bébés (je ne pensais pas que faire des bébés était aussi compliqué)
+    let nb_bebes = ReLU(Math.min(entite1.taux_reproduction, 100 - tailles_tribus[entite1.tribu]));
+    //let nb_bebes = entite1.taux_reproduction;
+    
+    //On rajoute ce nombre de bébés
+    for(let i=0; i<nb_bebes; i++) {
         liste_entites.push({
             tribu: entite1.tribu,
             position: entite1.position,
@@ -134,13 +152,52 @@ function faireBebes(entite1, entite2, nb_sexes) {
             sexe: randint(0, nb_sexes-1),
             force: entite1.force,
             perception: entite1.perception,
-            taux_reproduction: entite1.taux_reproduction
+            taux_reproduction: entite1.taux_reproduction,
+            vient_de_bouger: false
         });
     }
+    
+    //
+    liste_scores[entite1.tribu] += entite1.taux_reproduction;
 }
 
-function tick(liste_entites, liste_terrain, nb_joueurs, nb_sexes) {
+/* Renvoie une liste contenant les tailles de chaque tribu */
+function getTaillesTribus(liste_entites, nb_joueurs) {
+    let tailles_tribus = Array(nb_joueurs).fill(0);
+    for(let entite of liste_entites) {
+        tailles_tribus[entite.tribu]++;
+    }
+    
+    return tailles_tribus;
+}
+
+/* Renvoie une liste d'entités classées selon leur tanières */
+function getListeTanieres(liste_entites, liste_terrain, nb_joueurs) {
+    liste_tanieres = Array(nb_joueurs);
+    for(let i=0; i<nb_joueurs; i++) { liste_tanieres[i] = []; }
+    for(let entite of liste_entites) {
+        if(getTypeTuile(liste_terrain, entite.position) == entite.tribu) {
+            liste_tanieres[entite.tribu].push(entite);        
+        }
+    }
+
+    return liste_tanieres;
+}
+
+
+function tick(liste_terrain, liste_entites, liste_scores, liste_actions, nb_joueurs, nb_sexes, iteration) {
     let [nb_lignes, nb_colonnes] = [liste_terrain.length, liste_terrain[0].length];
+    
+    /* Lorsqu'un utilisateur arrive en milieu de partie, ou prend du retard, le serveur lui enverra une liste d'actions */
+    /* ainsi que l'itération (timetepp) à laquelle cette action a été faite. Cela va permettre à cet utilisateur de     */
+    /* reconstruire la partie d'une manière déterministe. C'est pour cela que, du côté du client, nous utilisons        */
+    /* seulement du pseudo-aléatoire. */
+    
+    //Tant qu'un joueur a fait une action à ce tick
+    while(liste_actions.length > 0 && liste_actions[0][3] == iteration) {
+        let action = liste_actions.shift();
+        executerAction(action, liste_terrain, liste_entites, liste_scores);
+    }
     
     //On bouge toutes les entités
     bougerEntites(liste_entites, liste_terrain);
@@ -156,20 +213,16 @@ function tick(liste_entites, liste_terrain, nb_joueurs, nb_sexes) {
             liste_entites.splice(i, 1)
         }
     }
-    
 
-    //On crée une liste d'entités classées selon leur tanières (si elles sont dans leur tanière)
-    tanieres = Array(nb_joueurs);
-    for(let i=0; i<nb_joueurs; i++) { tanieres[i] = []; }
-    for(let entite of liste_entites) {
-        if(getTypeTuile(liste_terrain, entite.position) == entite.tribu) {
-            tanieres[entite.tribu].push(entite);        
-        }
-    }
+    //On calcule les tailles de chaque tribu    
+    let tailles_tribus = getTaillesTribus(liste_entites, nb_joueurs);
+    //On calcule la liste des tanières
+    let liste_tanieres = getListeTanieres(liste_entites, liste_terrain, nb_joueurs);
+    
     
     //Pour chaque tanière
-    for(let taniere of tanieres) {
-        //Pour chaque paire d'entités
+    for(let taniere of liste_tanieres) {
+        //Pour chaque paire d'entités de cette tanière
         for(let i=0; i<taniere.length; i++) {
             let entite1 = taniere[i];
             for(let j=i+1; j<taniere.length; j++) {
@@ -177,7 +230,7 @@ function tick(liste_entites, liste_terrain, nb_joueurs, nb_sexes) {
                 //Si elles sont de sexe différent et qu'elles ont toutes les deux un taux d'abstinence supérieur ou égal à 5
                 if(entite1.sexe != entite2.sexe && entite1.abstinence >= 5 && entite2.abstinence >= 5) {
                     //Elles font des bébés
-                    faireBebes(entite1, entite2, nb_sexes);
+                    faireBebes(entite1, entite2, nb_sexes, liste_entites, liste_scores, tailles_tribus);
                 }
             }
         }
