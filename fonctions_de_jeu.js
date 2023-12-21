@@ -67,7 +67,6 @@ function genererEntites(nb_joueurs_max, nb_entites_par_joueur, liste_forces, lis
             });
         }
     }
-    
     return liste_entites;
 }
 
@@ -94,25 +93,24 @@ function getNewStats(entite, liste_terrain) {
 /* paresseux au bout de quelques secondes, et n'itèrent plus qu'une fois par seconde. Cela  */
 /* n'arrive pas sur Firefox, qui devient paresseux seulement quand la page est cachée (ce   */
 /* qui ne gène pas car la boucle rattrape un retard d'une heure en moins de deux secondes). */
-function boucle(debut_partie, liste_entites, liste_terrain, nb_iterations_max, iteration=1) {
+function boucle(debut_partie, liste_entites, liste_terrain, nb_joueurs, nb_sexes, nb_iterations_max, iteration=1) {
     //On attend un certain temps avant de lancer le tick et de le dessiner
     //S'il y a du retard, on attend moins longtemps pour rattraper ce retard.
-    let temps_a_attendre = (debut_partie + (100 * iteration)) - Date.now(); 
-    
+    let temps_a_attendre = (debut_partie + (100 * iteration)) - Date.now();
     //Si on est en retard d'au moins un tick, on appelle setTimeout une fois sur 1000 pour éviter les erreurs de récursion.
     //(On appelle setTimeout le moins que possible car cela fait perdre au moins 4ms, même en donnant un nombre négatif)
     if(temps_a_attendre > 0 || (iteration % 1000 == 0)) {
         setTimeout(() => {
-            tick(liste_entites, liste_terrain);
+            tick(liste_entites, liste_terrain, nb_joueurs, nb_sexes);
             dessiner(liste_terrain, liste_entites, 10, 30);
             if(iteration!=nb_iterations_max) {
-                boucle(debut_partie, liste_entites, liste_terrain, nb_iterations_max, iteration + 1)
+                boucle(debut_partie, liste_entites, liste_terrain, nb_joueurs, nb_sexes, nb_iterations_max, iteration + 1)
             }
         }, temps_a_attendre);
     } else {
-        tick(liste_entites, liste_terrain);
+        tick(liste_entites, liste_terrain, nb_joueurs, nb_sexes);
         if(iteration!=nb_iterations_max) {
-            boucle(debut_partie, liste_entites, liste_terrain, nb_iterations_max, iteration + 1)
+            boucle(debut_partie, liste_entites, liste_terrain, nb_joueurs, nb_sexes, nb_iterations_max, iteration + 1)
         } else {
             dessiner(liste_terrain, liste_entites, 10, 30);
         }
@@ -124,9 +122,10 @@ function moyenne(a, b) {
 }
 
 function faireBebes(entite1, entite2, nb_sexes) {
-    console.log("babybel")
+    console.log("Faisance de bébés effectuée avec succès pour la tribu", entite1.tribu);
     entite1.abstinence = 0;
     entite2.abstinence = 0;
+    console.log(entite1.taux_reproduction);
     for(let k=0; k<entite1.taux_reproduction; k++) {
         liste_entites.push({
             tribu: entite1.tribu,
@@ -162,10 +161,10 @@ function tick(liste_entites, liste_terrain, nb_joueurs, nb_sexes) {
     
 
     //On crée une liste d'entités classées selon leur tanières (si elles sont dans leur tanière)
-    tanieres = Array(nb_joueurs)
-    for(let i in tanieres) {tanieres[i] = [];}
+    tanieres = Array(nb_joueurs);
+    for(let i=0; i<nb_joueurs; i++) { tanieres[i] = []; }
     for(let entite of liste_entites) {
-        if(getTypeTuile(liste_terrain, entite.position) <= 3) {
+        if(getTypeTuile(liste_terrain, entite.position) == entite.tribu) {
             tanieres[entite.tribu].push(entite);        
         }
     }
