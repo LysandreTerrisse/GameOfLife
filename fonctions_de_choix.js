@@ -73,7 +73,7 @@ function choix(entite, liste_terrain) {
     if(entite.satiete >= 6 && entite.hydratation >= 6 && distanceManhattan(entite.position, pos_taniere) <= entite.perception) {
         return allerVers(pos_taniere, entite);
     //Sinon, si l'entité est dans une tanière et qu'elle n'est pas sur le point de mourir, alors elle reste
-    } else if(pos_taniere[0] == entite.position[0] && pos_taniere[1] == entite.position[1] && entite.satiete >= 4 && entite.hydratation >= 4) {
+    } else if(pos_taniere[0] == entite.position[0] && pos_taniere[1] == entite.position[1] && entite.satiete >= 5 && entite.hydratation >= 5) {
         return 7;
     //Sinon
     } else {
