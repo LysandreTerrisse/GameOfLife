@@ -10,6 +10,7 @@
     <script src="./fonctions_de_collisions.js"></script>
     <script src="./fonctions_de_choix.js"></script>
     <script src="./fonctions_de_pouvoirs.js"></script>
+    <title>Le jeu de la vie</title>
     <script>
     //var {genererTerrain, genererEntites, tick} = require("./fonctions_de_jeu");
     //var {enleverInputsCreationPartie, enleverInputsDeConnexion} = require("./fonctions_de_dessin");
@@ -122,18 +123,26 @@
         <input type="button" id="bouton_jouer" onclick="demanderJoindrePartie()" value="Jouer" />
     </header>
     <script>updateStats();</script>
-    
 
     <div id="tablier"></div>
 
-    <div id="pouvoirs">
-        <input type="button" onclick="setPouvoir(0)" id="bouton_total_energies" value="Total Energies (40pts)" /> <a>Faites disparaître une case prairie</a> </br>
+    <div id="menu_pouvoirs">
+        <input type="button" onclick="setPouvoir(0)" id="bouton_total_energies" value="Total Energies (40pts)" /> <a>Appuyez sur une prairie pour que vos entités y déploient une entreprise pétrolière</a> </br>
         <input type="button" onclick="setPouvoir(1)" id="bouton_abracadabra" value="Abracadabra (50pts)" /> <a>Appuyez sur un rocher et une eau/prairie pour les échanger</a> </br>
-        <input type="button" onclick="setPouvoir(2)" id="bouton_big_brain_time" value="It's big brain time (100pts)" /> <a>Vos entités évaluent 25 cases en plus avant de faire leur choix</a> </br>        
+        <input type="button" onclick="setPouvoir(2)" id="bouton_big_brain_time" value="It's big brain time (75pts)" /> <a>Vos entités évaluent 25 cases en plus avant de faire leur choix</a> </br>
         <input type="button" onclick="setPouvoir(3)" id="bouton_vision_ensemble" value="Vision d'ensemble (100pts)" /> <a>Vos entités peuvent voir une case plus loin</a> </br>
-        <input type="button" onclick="setPouvoir(4)" id="bouton_hoax" value="It's a hoax (130pts)" /> <a>Vos entités ignorent le réchauffement climatique et font disparaître la moitié des prairies</a> </br>
-        <input type="button" onclick="setPouvoir(5)" id="bouton_ineluctable" value="Désormais inéluctable (200pts)" /> <a>Vos entités obtiennent un gant d'infinité et font disparaître la moitié des entités adverses</a> </br>
+        <input type="button" onclick="setPouvoir(4)" id="bouton_hoax" value="It's a hoax (130pts)" /> <a>Vos entités ignorent le réchauffement climatique chaque prairie a une chance sur deux de disparaître</a> </br>
+        <input type="button" onclick="setPouvoir(5)" id="bouton_ineluctable" value="Désormais inéluctable (200pts)" /> <a>Vos entités obtiennent un gant d'infinité et font disparaître en moyenne la moitié des entités adverses</a> </br>
         <input type="button" onclick="setPouvoir(6)" id="bouton_superintelligence" value="The Superintelligent Will (500pts)" /> <a>Vos entités ignorent les conseils des chercheurs en sécurité de l'IA et développent une superintelligence</a> </br>
+    </div>
+
+    <div id="menu_fin_superintelligence" style="display:none">
+        <h1>Toutes les entités sont mortes</h1>
+        <p>
+            Selon <a href="https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/">le dernier sondage de Katja Grace</a>,
+            48% des chercheurs en IA donnent au moins 10% de chances quant au fait que l'IA causera l'extinction de l'humanité.
+            Ainsi, en négligeant les risques, les entités sont toutes mortes avant même d'avoir eu le temps de le réaliser.
+        </p>
     </div>
 </body>
 </html>
