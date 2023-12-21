@@ -122,10 +122,8 @@ function moyenne(a, b) {
 }
 
 function faireBebes(entite1, entite2, nb_sexes) {
-    console.log("Faisance de bébés effectuée avec succès pour la tribu", entite1.tribu);
     entite1.abstinence = 0;
     entite2.abstinence = 0;
-    console.log(entite1.taux_reproduction);
     for(let k=0; k<entite1.taux_reproduction; k++) {
         liste_entites.push({
             tribu: entite1.tribu,
