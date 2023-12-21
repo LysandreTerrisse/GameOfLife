@@ -3,6 +3,11 @@ var pouvoir = null;
 
 function setPouvoir(x) {
     pouvoir = x;
+
+    //Si le pouvoir n'est pas 0 ou 1, alors on n'a pas besoin de cliquer sur une tuile pour l'envoyer. On l'envoie donc maintenant.
+    if(pouvoir > 1) {
+        socket.emit("envoyer_action", getIdentifiantSecret(), pouvoir, []);
+    }
 }
 
 /* Prend un hexagone D3.js correspondant à une tuile, et renvoie la position correspondante. */
@@ -69,6 +74,11 @@ function executerAction(action, liste_terrain, liste_entites, liste_scores) {
     switch(true) {
         case (pouvoir==0 && score >= 40 && liste_types_tuiles[0] == "P") : TotalEnergies(liste_positions, liste_terrain); break;
         case (pouvoir==1 && score >= 50 && liste_types_tuiles.includes("R") && (liste_types_tuiles.includes("E") || liste_types_tuiles.includes("P"))) : Abracadabra(liste_positions, liste_terrain); break;
+        case (pouvoir==2 && score >= 75 ) : ItsBigBrainTime(liste_entites, numero_utilisateur); break;
+        case (pouvoir==3 && score >= 100) : VisionEnsemble(liste_entites, numero_utilisateur); break;
+        case (pouvoir==4 && score >= 130) : ItsAHoax(liste_terrain); break;
+        case (pouvoir==5 && score >= 200) : DesormaisIneluctable(liste_entites, numero_utilisateur); break;
+        case (pouvoir==6 && score >= 100) : TheSuperintelligentWill(liste_entites); break;
     }
     dessinerTout(liste_terrain, liste_entites, 10, 30)
 }
@@ -83,4 +93,57 @@ function Abracadabra(liste_positions, liste_terrain) {
     console.log("Abracadabra");
     permuter(liste_terrain, liste_positions[0], liste_positions[1]);
 }
+
+function ItsBigBrainTime(liste_entites, numero_utilisateur) {
+    console.log("It's big brain time");
+    for(let entite of liste_entites) {
+        if(entite.tribu == numero_utilisateur) {
+            entite.intelligence += 25;
+        }
+    }
+}
+
+function VisionEnsemble(liste_entites, numero_utilisateur) {
+    console.log("Vision d'ensemble");
+    for(let entite of liste_entites) {
+        if(entite.tribu == numero_utilisateur) {
+            entite.perception += 1;
+        }
+    }
+}
+
+function ItsAHoax(liste_terrain) {
+    console.log("It's a hoax");
+    for(let i=0; i<liste_terrain.length; i++) {
+        for(let j=0; j<liste_terrain[0].length; j++) {
+            if(liste_terrain[i][j] == "P" && randint(0, 1)) {
+                liste_terrain[i][j] = "R";
+            }
+        }
+    }
+}
+
+function DesormaisIneluctable(liste_entites, numero_utilisateur) {
+    console.log("Désormais inéluctable");
+    for(let i=liste_entites.length-1; i>=0; i--) {
+        if(liste_entites[i].tribu != numero_utilisateur && randint(0, 1)) {
+            liste_entites.splice(i, 1);
+        }
+    }
+}
+
+function TheSuperintelligentWill(liste_entites) {
+    console.log("The Superintelligent Will");
+    liste_entites.splice(0, liste_entites.length);
+    
+    enleverInputsCreationPartie();
+    enleverInputsDeConnexion();
+    document.getElementById("menu_partie").style.display = "none";
+    document.getElementById("menu_pouvoirs").style.display = "none";
+    document.getElementById("tablier").style.display = "none";
+    d3.select("#tablier").remove();
+    document.getElementById("menu_fin_superintelligence").style.display = "block";
+    
+}
+
 
