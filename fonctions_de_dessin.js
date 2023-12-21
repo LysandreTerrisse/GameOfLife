@@ -35,13 +35,12 @@ function dessinerPremiereFois(liste_terrain, liste_entites, rayon_entites, rayon
     .attr("height", "100%")
     .attr("fill", "pink")
     
-    dessiner(liste_terrain, liste_entites, rayon_entites, rayon_tuiles);
+    dessinerTout(liste_terrain, liste_entites, rayon_entites, rayon_tuiles)
 }
 
 
 /* Efface tout et redessine tout*/
-function dessiner(liste_terrain, liste_entites, rayon_entites, rayon_tuiles) {
-    d3.selectAll("path").remove(); // On enlève tous les hexagones
+function dessinerTout(liste_terrain, liste_entites, rayon_entites, rayon_tuiles) {
     dessinerTerrain(liste_terrain, rayon_tuiles); // On redessine le terrain
     dessinerEntites(liste_entites, rayon_entites, rayon_tuiles) // On redessine les entités
 }
@@ -62,44 +61,49 @@ function getCouleur(i) {
 
 
 
-/* Dessine uniquement le terrain (sans effacer) */
+/* Dessine uniquement le terrain (en effaçant) */
 function dessinerTerrain(liste_terrain, rayon) {
-    let [nb_lignes, nb_colonnes] = [liste_terrain.length, liste_terrain[0].length]
-    for (let i=0; i < nb_lignes; i++) {
-        for (let j=0; j < nb_colonnes; j++) {
+    //On supprime les hexagones du terrain
+    d3.selectAll(".tuile").remove();
+    
+    //On dessine les tuiles
+    for (let i=0; i < liste_terrain.length; i++) {
+        for (let j=0; j < liste_terrain[0].length; j++) {
             d3.select("svg")
             .append("path")
             .attr("d", hexagoneSerialise(rayon, rayon, [i, j]))
             .attr("stroke", "black")
             .attr("fill", getCouleur(liste_terrain[i][j]))
             .attr("id", "t" + i + "-" + j) // t pour "tuile"
-            .on("click", function(d) {
-                //On verra plus tard ce qu'il se passe quand on clique
-            });
+            .attr("class", "tuile")
+            .on("click", tuileCliquee); //Utiliser .on("click", (d) => { tuileCliquee(d); }); ne fonctionnait pas. Il faudra utiliser this à la place.
         }
     }
 }
 
-
-/* Dessine uniquement les entités (sans effacer). Si deux entités sont à la même */
-/* position (possible seulement dans une tanière), on ne dessine qu'un hexagone. */
+/* Dessine uniquement les entités (en effaçant préalablement). Si deux entités sont à la */
+/* même position (possible seulement dans une tanière), on ne dessine qu'un hexagone.    */
 function dessinerEntites(liste_entites, rayon, rayon_tuiles) {
+    //On supprime les hexagones des entités
+    d3.selectAll(".entite").remove();
+
     //On crée une liste contenant au plus une entité par position
     let liste_entites_disjointes = [];
     for(let entite1 of liste_entites) {
         let position_est_unique = liste_entites_disjointes.every((entite2) => { return entite1.position[0] != entite2.position[0] || entite1.position[1] != entite2.position[1]; });
         if(position_est_unique) {
             liste_entites_disjointes.push(entite1);
-            
         }
     }
     
+    //On dessine les entités de cette liste
     for(let i in liste_entites_disjointes) {
         d3.select("svg")
         .append("path")
         .attr("d", hexagoneSerialise(rayon, rayon_tuiles, liste_entites_disjointes[i].position))
         .attr("stroke", "white")
         .attr("fill", getCouleur(liste_entites_disjointes[i].tribu))
-        .attr("id", "e" + i); // e pour "entité"
+        .attr("id", "e" + i) // e pour "entité"
+        .attr("class", "entite");
     }
 }
