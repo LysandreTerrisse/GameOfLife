@@ -68,7 +68,7 @@ function genererEntites(infos) {
                 force: infos.liste_forces[i],
                 perception: infos.liste_perceptions[i],
                 taux_reproduction: infos.liste_taux_reproduction[i],
-                nb_sexes: infos.nb_sexes,
+                intelligence: 50, //Nombre de cases évaluées en cherchant des ressources
                 vient_de_bouger: false
             });
         }
@@ -110,13 +110,13 @@ function boucle(infos, iteration=1) {
             tick(infos.liste_terrain, infos.liste_entites, infos.liste_scores, infos.liste_actions, infos.liste_joueurs.length, infos.nb_sexes, iteration);
             dessinerEntites(infos.liste_entites, 10, 30);
             document.getElementById("paragraphe_liste_scores").innerHTML = infos.liste_scores.join(" ");
-            if(iteration!=infos.nb_iterations_max) {
+            if(iteration!=infos.nb_iterations_max && infos.liste_entites.length != 0) {
                 boucle(infos, iteration + 1)
             }
         }, temps_a_attendre);
     } else {
         tick(infos.liste_terrain, infos.liste_entites, infos.liste_scores, infos.liste_actions, infos.liste_joueurs.length, infos.nb_sexes, iteration);
-        if(iteration!=infos.nb_iterations_max) {
+        if(iteration!=infos.nb_iterations_max && infos.liste_entites.length != 0) {
             boucle(infos, iteration + 1)
         } else {
             dessinerEntites(infos.liste_entites, 10, 30);
@@ -153,6 +153,7 @@ function faireBebes(entite1, entite2, nb_sexes, liste_entites, liste_scores, tai
             force: entite1.force,
             perception: entite1.perception,
             taux_reproduction: entite1.taux_reproduction,
+            intelligence: entite1.intelligence,
             vient_de_bouger: false
         });
     }
