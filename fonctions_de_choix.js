@@ -67,7 +67,7 @@ function chercherAutour(entite, ressource, liste_terrain, n) {
 
 function choix(entite, liste_terrain) {
     let [nb_lignes, nb_colonnes] = [liste_terrain.length, liste_terrain[0].length];
-    let pos_taniere = getPosTaniere(entite.tribu, nb_lignes, nb_colonnes)
+    let pos_taniere = getPosTaniere(entite.tribu, nb_lignes, nb_colonnes);
     
     //Si l'entité a une satiété et une hydratation plus grande ou égale à 6 et qu'elle voit la tanière, alors elle essaie d'y aller
     if(entite.satiete >= 6 && entite.hydratation >= 6 && distanceManhattan(entite.position, pos_taniere) <= entite.perception) {
@@ -82,7 +82,7 @@ function choix(entite, liste_terrain) {
 
         //Par ordre de priorité, elle cherche la ressource, et si elle la trouve, elle y va.
         for(let ressource of priorite) {
-            let pos_ressource = chercherAutour(entite, ressource, liste_terrain, 20);
+            let pos_ressource = chercherAutour(entite, ressource, liste_terrain, 100);
             if(pos_ressource !== null) {
                 return allerVers(pos_ressource, entite);
             }
