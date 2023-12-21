@@ -13,6 +13,7 @@ var infos = {
     liste_forces: [],
     liste_perceptions: [],
     liste_taux_reproduction: [],
+    liste_actions: [], //Une liste de [numero_joueur, pouvoir, liste_positions_cliquees, iteration]
     nb_joueurs_max: 0,
     nb_entites_par_joueur: 0,
     nb_iterations_max: 0,
@@ -20,7 +21,8 @@ var infos = {
     nb_lignes: 0,
     nb_colonnes: 0,
     seed: Math.floor(Math.random()*1000000), //Un entier réellement aléatoire dans [0;999999]
-    debut_partie: 0 //Va permettre aux joueurs de se synchroniser
+    debut_partie: 0, //Va permettre aux joueurs de se synchroniser
+    temps_tick: 100 //100ms 
 }
 
 var infos_privees = {
@@ -31,6 +33,8 @@ function borner(valeur, a, b) {
     return Math.min(Math.max(valeur, a), b)
 }
 
+// J'ai mis quelques sécurités, comme borner les valeurs données par le joueur, et vérifier le joueur grâce à un identifiant secret.
+// En pratique, il faudrait aussi vérifier le bon type de chaque paramètre et éviter les injections de code.
 io.on("connection", socket => {
     
     socket.on("obtenir_infos", () => { // Quand un utilisateur demande les infos
@@ -72,6 +76,22 @@ io.on("connection", socket => {
             io.emit("infos", infos);
         }
     });
+    
+    socket.on("envoyer_action", (identifiant_secret, pouvoir, liste_positions_cliquees) => {
+        // On vérifie que l'identifiant secret correspond bien à un joueur.
+        // Le reste (vérifier que le joueur peut en effet utiliser ce pouvoir avec ces tuiles) sera
+        // vérifié par les clients qui, contrairement au serveur, ont la liste des tuiles et les scores.
+        let numero_joueur = infos_privees.identifiants_secrets.indexOf(identifiant_secret);
+        
+        //On stocke le pouvoir envoyé avec le moment où il a été fait
+        let iteration = Math.floor((Date.now() - infos.debut_partie) / infos.temps_tick) + 1;
+        let action = [numero_joueur, pouvoir, liste_positions_cliquees, iteration];
+        infos.liste_actions.push(action)
+        
+        if(numero_joueur != -1) {
+            io.emit("action", action);
+        }
+    });
 });
 
 app.get("/", function(request, response) {
@@ -101,3 +121,9 @@ app.get("/fonctions_de_collisions.js", function(request, response) {
 app.get("/fonctions_de_choix.js", function(request, response) {
     response.sendFile("fonctions_de_choix.js", {root: __dirname});
 });
+
+app.get("/fonctions_de_pouvoirs.js", function(request, response) {
+    response.sendFile("fonctions_de_pouvoirs.js", {root: __dirname});
+});
+
+
