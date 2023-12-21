@@ -76,6 +76,8 @@ function estTaniereAdverse(position, entite, liste_terrain) {
 function deplacer(entite, position, matrice_entites) {
     //On dit à la matrice que notre position actuelle est libre
     matrice_entites[entite.position[0]][entite.position[1]] = 0;
+    //On dit si l'entité vient de bouger
+    entite.vient_de_bouger = (entite.position[0] != position[0]) || (entite.position[1] != position[1])
     //On déplace l'entité
     entite.position = position;
     //On dit à la matrice que notre nouvelle position n'est plus libre
