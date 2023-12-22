@@ -1,5 +1,6 @@
 # Le jeu de la vie
 Par Lysandre Terrisse et Emmanuel Sanchez
+Cliquez [ici](https://github.com/LysandreTerrisse/GameOfLife) pour accéder au GitHub.
 
 ## Commandes
 Pour lancer le site, commencez par taper la commande `npm install express socket.io`.
