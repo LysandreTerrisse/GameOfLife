@@ -100,6 +100,9 @@ function getNewStats(entite, liste_terrain) {
 /* n'arrive pas sur Firefox, qui devient paresseux seulement quand la page est cachée (ce   */
 /* qui ne gène pas car la boucle rattrape un retard d'une heure en moins de deux secondes). */
 function boucle(infos, iteration=1) {
+    //On met à jour les boutons de pouvoir
+    updateBoutonsDePouvoir(infos.liste_points);
+    
     //On attend un certain temps avant de lancer le tick et de le dessiner
     //S'il y a du retard, on attend moins longtemps pour rattraper ce retard.
     let temps_a_attendre = (infos.debut_partie + (infos.temps_tick * iteration)) - Date.now();
@@ -249,8 +252,6 @@ function tick(liste_terrain, liste_entites, liste_points, liste_actions, nb_joue
                 }
             }
         }
-        
-        
     }
 }
 
@@ -269,7 +270,7 @@ function finPartie(liste_entites, liste_points, liste_joueurs) {
     liste_numeros_gagnants = liste_numeros_gagnants.filter((numero) => tailles_tribus[numero] == taille_maximale);
     //On détermine le point maximal des tribus restantes
     let liste_points_gagnants = liste_numeros_gagnants.map((numero) => { return liste_points[numero]; });
-    let point_maximal = Math.max(liste_points_gagnants);
+    let point_maximal = Math.max(...liste_points_gagnants);
     //On ne garde que les tribus de point maximal
     liste_numeros_gagnants = liste_numeros_gagnants.filter((numero) => liste_points[numero] == point_maximal);
     //On fait correspondre les numéros gagnants avec les noms des joueurs
