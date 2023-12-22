@@ -61,9 +61,9 @@ function verifierAction(action, nb_lignes, nb_colonnes) {
 }
 
 /* Garantit que l'utilisation de ce pouvoir est valide */
-function executerAction(action, liste_terrain, liste_entites, liste_scores) {
+function executerAction(action, liste_terrain, liste_entites, liste_points) {
     let [numero_utilisateur, pouvoir, liste_positions, iteration] = action;
-    let score = liste_scores[numero_utilisateur];
+    let score = liste_points[numero_utilisateur];
     
     //On crée une liste contenant, pour chaque position de l'action, le  type de la tuile correspondant
     liste_types_tuiles = []
@@ -72,13 +72,15 @@ function executerAction(action, liste_terrain, liste_entites, liste_scores) {
     }
     
     switch(true) {
-        case (pouvoir==0 && score >= 40 && liste_types_tuiles[0] == "P") : TotalEnergies(liste_positions, liste_terrain); break;
-        case (pouvoir==1 && score >= 50 && liste_types_tuiles.includes("R") && (liste_types_tuiles.includes("E") || liste_types_tuiles.includes("P"))) : Abracadabra(liste_positions, liste_terrain); break;
-        case (pouvoir==2 && score >= 75 ) : ItsBigBrainTime(liste_entites, numero_utilisateur); break;
-        case (pouvoir==3 && score >= 100) : VisionEnsemble(liste_entites, numero_utilisateur); break;
-        case (pouvoir==4 && score >= 130) : ItsAHoax(liste_terrain); break;
-        case (pouvoir==5 && score >= 200) : DesormaisIneluctable(liste_entites, numero_utilisateur); break;
-        case (pouvoir==6 && score >= 500) : TheSuperintelligentWill(liste_entites); break;
+        case (pouvoir==0 && score >= 40 && liste_types_tuiles[0] == "P") :
+                                            liste_points[numero_utilisateur] -= 40 ; TotalEnergies(liste_positions, liste_terrain); break;
+        case (pouvoir==1 && score >= 50 && liste_types_tuiles.includes("R") && (liste_types_tuiles.includes("E") || liste_types_tuiles.includes("P"))) :
+                                            liste_points[numero_utilisateur] -= 50 ; Abracadabra(liste_positions, liste_terrain); break;
+        case (pouvoir==2 && score >= 75 ) : liste_points[numero_utilisateur] -= 75 ; ItsBigBrainTime(liste_entites, numero_utilisateur); break;
+        case (pouvoir==3 && score >= 100) : liste_points[numero_utilisateur] -= 100; VisionEnsemble(liste_entites, numero_utilisateur); break;
+        case (pouvoir==4 && score >= 130) : liste_points[numero_utilisateur] -= 130; ItsAHoax(liste_terrain); break;
+        case (pouvoir==5 && score >= 200) : liste_points[numero_utilisateur] -= 200; DesormaisIneluctable(liste_entites, numero_utilisateur); break;
+        case (pouvoir==6 && score >= 500) : liste_points[numero_utilisateur] -= 500; TheSuperintelligentWill(liste_entites); break;
     }
     dessinerTout(liste_terrain, liste_entites, 10, 30)
 }
@@ -136,14 +138,13 @@ function TheSuperintelligentWill(liste_entites) {
     console.log("The Superintelligent Will");
     liste_entites.splice(0, liste_entites.length);
     
-    enleverInputsCreationPartie();
-    enleverInputsDeConnexion();
-    document.getElementById("menu_partie").style.display = "none";
-    document.getElementById("menu_pouvoirs").style.display = "none";
+    enleverMenuCreationPartie();
+    enleverMenuConnexion();
+    enleverMenuPouvoirs();
+    enleverMenuPrincipal();
+    
     document.getElementById("tablier").style.display = "none";
     d3.select("#tablier").remove();
-    document.getElementById("menu_fin_superintelligence").style.display = "block";
     
+    ajouterMenuFinSuperintelligence();
 }
-
-
