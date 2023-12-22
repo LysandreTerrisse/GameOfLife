@@ -55,9 +55,9 @@ function getCouleur(i) {
         case  1 : return "purple";
         case  2 : return "orange";
         case  3 : return "yellow";
-        case "E": return "blue"  ;
-        case "P": return "green" ;
-        case "R": return "grey"  ;
+        case "E": return "#06F"  ;//
+        case "P": return "#6B0"  ;//
+        case "R": return "#875"  ;
     }
 }
 
