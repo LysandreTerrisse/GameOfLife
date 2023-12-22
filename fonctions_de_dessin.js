@@ -24,11 +24,13 @@ function hexagoneSerialise(rayon, rayon_tuiles, position) {
 /* Crée une toile. Il ne faut pas appeler cette fonction plusieurs fois. */
 function dessinerPremiereFois(liste_terrain, liste_entites, rayon_entites, rayon_tuiles) {
     let [nb_lignes, nb_colonnes] = [liste_terrain.length, liste_terrain[0].length]
+    
     let distance_tuiles = rayon_tuiles*Math.cos(Math.PI / 6);
+    let width = (nb_colonnes*2 + (nb_lignes-1))*distance_tuiles + 20;
+    let height = (nb_lignes*1.5 + 0.5)*rayon_tuiles + 20;
     
     d3.select("#tablier").append("svg")
-    .attr("width", (nb_colonnes*2 + (nb_lignes-1))*distance_tuiles + 20)
-    .attr("height", (nb_lignes*1.5 + 0.5)*rayon_tuiles + 20);
+    .attr("viewBox", `0 0 ${width} ${height}`) //viewBox permet de faire du responsive
     
     d3.select("svg").append("rect")
     .attr("width", "100%")
