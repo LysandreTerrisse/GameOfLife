@@ -37,7 +37,7 @@ Ce bug n'est arrivé que très rarement pour nous, mais nous pensons que, si le 
 
 ## Baby-boom
 
-Puisque l'algorithme de décision de nos entités est efficace, en suivant les règles du jeu à la lettre, nos entités faisaient un "baby-boom". Ainsi, des dizaines de milliers d'entités apparaissaient en moins d'une cinquantaine d'itérations (donc en moins de cinq secondes). Nous avons donc décidé de limiter le nombre d'entités par joueur à 100. Cependant, il n'y avait donc plus aucun intérêt à essayer de générer un baby-boom. Nous avons donc implémenté un système de points.
+Puisque l'algorithme de décision de nos entités est efficace, en suivant les règles du jeu à la lettre, nos entités faisaient un "baby-boom". Ainsi, des dizaines de milliers d'entités apparaissaient en moins d'une cinquantaine d'itérations (donc en moins de cinq secondes). Nous avons donc décidé de limiter le nombre d'entités par joueur à 100. Cependant, il n'y avait plus aucun intérêt à essayer de générer un baby-boom. Nous avons donc implémenté un système de points.
 
 ## Points et pouvoirs
 
