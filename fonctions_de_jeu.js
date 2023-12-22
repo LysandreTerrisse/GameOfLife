@@ -113,7 +113,7 @@ function boucle(infos, iteration=1) {
             if(iteration!=infos.nb_iterations_max && infos.liste_entites.length != 0) {
                 boucle(infos, iteration + 1)
             } else {
-                finPartie(infos.liste_points, infos.liste_joueurs);
+                finPartie(infos.liste_entites, infos.liste_points, infos.liste_joueurs)
             }
         }, temps_a_attendre);
     } else {
@@ -122,7 +122,7 @@ function boucle(infos, iteration=1) {
             boucle(infos, iteration + 1)
         } else {
             dessinerEntites(infos.liste_entites, 10, 30);
-            finPartie(infos.liste_points, infos.liste_joueurs);
+            finPartie(infos.liste_entites, infos.liste_points, infos.liste_joueurs)
         }
     }
 }
@@ -134,7 +134,7 @@ function moyenne(a, b) {
 /* Fait des bébés. Quand on avait initialement programmé cette fonction, le nombre d'entités  */
 /* augmentait exponentiellement, et pouvait dépasser les 100000 en moins d'une centaine       */
 /* d'itérations, faisant crasher la page. Nous avons donc décidé que chaque joueur a au plus  */
-/* 100 entités, mais que son score continue d'augmenter après cela.                           */
+/* 100 entités, mais que son point continue d'augmenter après cela.                           */
 function faireBebes(entite1, entite2, nb_sexes, liste_entites, liste_points, tailles_tribus) {
     //On met l'abstinence des entités à 0
     entite1.abstinence = 0;
@@ -177,7 +177,7 @@ function getTaillesTribus(liste_entites, nb_joueurs) {
 
 /* Renvoie une liste d'entités classées selon leur tanières */
 function getListeTanieres(liste_entites, liste_terrain, nb_joueurs) {
-    liste_tanieres = Array(nb_joueurs);
+    let liste_tanieres = Array(nb_joueurs);
     for(let i=0; i<nb_joueurs; i++) { liste_tanieres[i] = []; }
     for(let entite of liste_entites) {
         if(getTypeTuile(liste_terrain, entite.position) == entite.tribu) {
@@ -186,6 +186,17 @@ function getListeTanieres(liste_entites, liste_terrain, nb_joueurs) {
     }
 
     return liste_tanieres;
+}
+
+/* Renvoie une liste d'entités classées selon leur tribu */
+function getListeTribus(liste_entites, nb_joueurs) {
+    let liste_tribus = Array(nb_joueurs);
+    for(let i=0; i<nb_joueurs; i++) { liste_tribus[i] = []; }
+    for(let entite of liste_entites) {
+        liste_tribus[entite.tribu].push(entite);
+    }
+
+    return liste_tribus;
 }
 
 
@@ -238,14 +249,33 @@ function tick(liste_terrain, liste_entites, liste_points, liste_actions, nb_joue
                 }
             }
         }
+        
+        
     }
 }
 
-
-function finPartie(liste_points, liste_joueurs) {
+/* Déclare le joueur gagnant selon le nombre d'entités restant à la fin de */
+/* la partie. S'il y a égalité, on départage selon le nombre de points.    */
+/* S'il y a encore égalité, on déclare tous ces joueurs gagnants.          */
+function finPartie(liste_entites, liste_points, liste_joueurs) {
+    //On enlève le menu des pouvoirs
     enleverMenuPouvoirs();
-    let score_max = Math.max(...liste_points);
-    let indice_vainqueur = liste_points.indexOf(score_max);
-    let nom_vainqueur = liste_joueurs[indice_vainqueur]
-    document.getElementById("paragraphe_nom_vainqueur").innerHTML = nom_vainqueur + " " + "gagne !";
+    
+    //On détermine la taille maximale des tribus
+    let tailles_tribus = getTaillesTribus(liste_entites, liste_joueurs.length);
+    let taille_maximale = Math.max(...tailles_tribus);
+    //On ne garde que les tribus de taille maximale
+    let liste_numeros_gagnants = [...liste_joueurs.keys()];
+    liste_numeros_gagnants = liste_numeros_gagnants.filter((numero) => tailles_tribus[numero] == taille_maximale);
+    //On détermine le point maximal des tribus restantes
+    let liste_points_gagnants = liste_numeros_gagnants.map((numero) => { return liste_points[numero]; });
+    let point_maximal = Math.max(liste_points_gagnants);
+    //On ne garde que les tribus de point maximal
+    liste_numeros_gagnants = liste_numeros_gagnants.filter((numero) => liste_points[numero] == point_maximal);
+    //On fait correspondre les numéros gagnants avec les noms des joueurs
+    liste_gagnants = liste_numeros_gagnants.map((numero) => { return liste_joueurs[numero]; })
+    console.log("liste_gagnants", liste_numeros_gagnants)
+    //On affiche la liste des gagnants
+    document.getElementById("paragraphe_noms_gagnants").innerHTML = liste_gagnants.join(" et ") + (liste_gagnants.length == 1 ? " a " : " ont ") + "gagné !";
+    console.log(liste_gagnants.join(" et ") + (liste_gagnants.length == 1 ? " a " : " ont ") + "gagné !");
 }
