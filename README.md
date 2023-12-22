@@ -24,7 +24,7 @@ Lorsqu'un joueur essaie de faire une action, il envoie au serveur l'action qu'il
 
 ## Qualités
 ### Et si un utilisateur essaie de tricher ?
-Si un joueur essaie de faire un mouvement illégal, les autres joueurs regarderont le mouvement qu'il a essayé de faire, réaliseront que ce mouvement est illégal, et l'ignoreront. Nous avons bien fait en sorte que chaque requête reçue de la part d'un autre utilisateur soit vérifiée. Même s'il est quasiment impossible de filtrer toutes les requêtes malveillantes (en pratique c'est possible, [comme dans cet article](https://arxiv.org/abs/1304.5087v4)), nous pensons que nos filtrages permettrons d'empêcher la plupart des fausses requêtes.
+Si un joueur essaie de faire un mouvement illégal, les autres joueurs regarderont le mouvement qu'il a essayé de faire, réaliseront que ce mouvement est illégal, et l'ignoreront. Nous avons bien fait en sorte que chaque requête reçue de la part d'un autre utilisateur soit vérifiée. Même s'il est quasiment impossible de filtrer toutes les requêtes malveillantes (en pratique c'est possible, [comme dans cet article](https://arxiv.org/abs/1304.5087v4)), nous pensons que nos filtrages permettront d'empêcher la plupart des fausses requêtes.
 
 ### Et si le serveur crashait ?
 Si le serveur crashe, les joueurs ne peuvent plus faire d'actions, mais peuvent toujours continuer de regarder la partie pour voir qui va gagner. Cela peut mieux se voir quand on quitte volontairement le serveur.
