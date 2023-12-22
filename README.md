@@ -64,7 +64,7 @@ Nous pouvons ainsi contrôler l'efficacité des entités seulement en augmentant
 
 ## Conclusion
 
-Ce projet a été très amusant à faire. Nous avons réussi à implémenter toutes les fonctionnalités que l'on nous avait demandé, et nous avons ajouté d'autres fonctionnalité comme les pouvoirs, les points, le facteur intelligence, l'indépendance du client, et l'identification sécurisée. Finalement, nous avons réussi à avoir un rendu CSS qui nous satisfait grandement.
+Ce projet a été très amusant à faire. Nous avons réussi à implémenter toutes les fonctionnalités que l'on nous avait demandé, et nous avons ajouté d'autres fonctionnalité comme les pouvoirs, les points, le facteur intelligence, l'indépendance du client, et l'identification sécurisée. Finalement, nous avons réussi à avoir un rendu CSS qui nous satisfait grandement, ce qui nous permettra de montrer ce projet à nos proches pour Noël.
 
 
 
