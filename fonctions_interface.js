@@ -1,10 +1,26 @@
-function enleverInputsCreationPartie() {
+function enleverMenuCreationPartie() {
     document.getElementById("menu_creation_partie").style.display = "none";
 }
 
-function enleverInputsDeConnexion() {
+function enleverMenuConnexion() {
     document.getElementById("menu_connexion").style.display = "none";
     document.getElementById("bouton_jouer").type = "hidden"; // On enlève le bouton "Jouer" même s'il n'est pas dans le même <div>
+}
+
+function ajouterMenuPouvoirs() {
+    document.getElementById("menu_pouvoirs").style.display = "block";
+}
+
+function enleverMenuPouvoirs() {
+    document.getElementById("menu_pouvoirs").style.display = "none";
+}
+
+function ajouterMenuFinSuperintelligence() {
+    document.getElementById("menu_fin_superintelligence").style.display = "block";
+}
+
+function enleverMenuPrincipal() {
+    document.getElementById("menu_principal").style.display = "none";
 }
 
 function extraireDepuisInterface() {
@@ -22,14 +38,25 @@ function extraireDepuisInterface() {
 }
 
 /* S'exécute quand l'un des input de type range change */
-/* Affiche le bon nombre de points non répartis        */
-function updateStats() {
+function updateRanges() {
     //On extrait les informations de l'interface
-    let [nom_joueur, force, perception, taux_reproduction, nb_joueurs, nb_entites_par_joueur, nb_iterations, nb_lignes, nb_colonnes] = extraireDepuisInterface();
+    let [nom_joueur, force, perception, taux_reproduction, nb_joueurs, nb_entites_par_joueur, nb_iterations, nb_sexes, nb_lignes, nb_colonnes] = extraireDepuisInterface();
+    
+    //On calcule le nombre de points non répartis
+    let nb_points_non_repartis = 9 - (force + perception + taux_reproduction);
+    
     //On modifie l'affichage des points non répartis, et des points de chaque statistique
-    document.getElementById("paragraphe_points_non_repartis").innerHTML = (9 - (force + perception + taux_reproduction));
-    document.getElementById("paragraphe_force").innerHTML = force;
-    document.getElementById("paragraphe_perception").innerHTML = perception;
-    document.getElementById("paragraphe_taux_reproduction").innerHTML = taux_reproduction;
+    document.getElementById("paragraphe_points_non_repartis"  ).innerHTML = nb_points_non_repartis;
+    document.getElementById("paragraphe_force"                ).innerHTML = force;
+    document.getElementById("paragraphe_perception"           ).innerHTML = perception;
+    document.getElementById("paragraphe_taux_reproduction"    ).innerHTML = taux_reproduction;
+    document.getElementById("paragraphe_nb_joueurs"           ).innerHTML = nb_joueurs;
+    document.getElementById("paragraphe_nb_entites_par_joueur").innerHTML = nb_entites_par_joueur;
+    document.getElementById("paragraphe_nb_sexes"             ).innerHTML = nb_sexes;
+    document.getElementById("paragraphe_nb_lignes"            ).innerHTML = nb_lignes;
+    document.getElementById("paragraphe_nb_colonnes"          ).innerHTML = nb_colonnes;
+    
+    //On bloque le bouton de connexion ssi le nombre de points répartis est négatif
+    document.getElementById("bouton_jouer").disabled = (nb_points_non_repartis < 0);
     
 }
