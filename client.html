@@ -17,15 +17,19 @@
     
     var infos;
     
-    var identifiant_secret;
+    var mon_identifiant_secret;
+    var mon_numero_joueur;
 
     function getIdentifiantSecret() {
-        return identifiant_secret;
+        return mon_identifiant_secret;
+    }
+    
+    function getNumeroJoueur() {
+        return mon_numero_joueur;
     }
     
     socket.on("infos", (infos_serveur) => { // Quand on reçoit les infos du serveur
         infos = infos_serveur;
-        console.log(infos);
         //On obtient la graine de génération pseudo-aléatoire du serveur
         if(!isSeedSet()) {
           setSeed(infos.seed);
@@ -50,8 +54,11 @@
         }
     });
     
-    socket.on("identifiant_secret", (identifiant_secret_obtenu) => { // Quand on reçoit l'identifiant secret
-        identifiant_secret = identifiant_secret_obtenu; // On le stocke
+    // Quand on reçoit l'identifiant secret et le numéro d'utilisateur
+    socket.on("identifiant_secret", (identifiant_secret, numero_joueur) => {
+        //On les stocke
+        mon_identifiant_secret = identifiant_secret;
+        mon_numero_joueur = numero_joueur;
     });
 
     socket.on("action", (action) => {
@@ -59,7 +66,6 @@
         
         if(verifierAction(action, infos.nb_lignes, infos.nb_colonnes)) {
             infos.liste_actions.push(action);
-            console.log("action poussée");
         }
     });
 
@@ -97,7 +103,7 @@
 <body>
     <header>
         <div id="menu_principal">
-            <h1>Jeu de la vie</h1>
+            <h1>Le jeu de la vie</h1>
             Nom du joueur : <a id="paragraphe_nom_joueur"></a> </br>
             Liste des joueurs : <a id="paragraphe_liste_joueurs"></a> </br>
             Liste des points : <a id="paragraphe_liste_points"></a> </br>
@@ -105,69 +111,113 @@
         </div>
         <div id="menu_connexion">
             <hr>
-            <h3>Connexion</h3>
-            Nom du joueur : <input type="text" id="champ_nom_joueur" /> </br>
-            Nombre de points non répartis : <a id="paragraphe_points_non_repartis"></a> / 9 </br>
-            Force des créatures : <input type="range" id="champ_force" oninput="updateRanges()" min="1" max="5" value="3" /> <a id="paragraphe_force"></a> </br>
-            Perception des créatures : <input type="range" id="champ_perception" oninput="updateRanges()" min="1" max="5" value="3" /> <a id="paragraphe_perception"></a> </br>
-            Taux de reproduction des créatures : <input type="range" id="champ_taux_reproduction" oninput="updateRanges()" min="1" max="5" value="3" /> <a id="paragraphe_taux_reproduction"></a> </br>
+            <h2>Connexion</h2>
+            Nom du joueur : <input type="text" id="champ_nom_joueur" /> <br> <br>
+            Nombre de points non répartis : <a id="paragraphe_points_non_repartis"></a> / 9 <br><br>
+            <div class="axe">
+                Force des créatures : <a id="paragraphe_force"></a>
+                <input type="range" id="champ_force" oninput="updateRanges()" min="1" max="5" value="3" />
+            </div>
+            <div class="axe">
+                Perception des créatures : <a id="paragraphe_perception"></a>
+                <input type="range" id="champ_perception" oninput="updateRanges()" min="1" max="5" value="3" />
+            </div>
+            <div class="axe">
+                Taux de reproduction des créatures : <a id="paragraphe_taux_reproduction"></a>
+                <input type="range" id="champ_taux_reproduction" oninput="updateRanges()" min="1" max="5" value="3" />
+            </div>
             <hr>
         </div>
         <div id="menu_creation_partie">
-            <h3>Création d'une partie</h3>
-            Nombre de joueurs : <input type="range" id="champ_nb_joueurs" oninput="updateRanges()" min="1" max="4" /> <a id="paragraphe_nb_joueurs"></a> </br>
-            Nombre d'entités par joueur : <input type="range" id="champ_nb_entites_par_joueur" oninput="updateRanges()" min="1" max="100" /> <a id="paragraphe_nb_entites_par_joueur"></a> </br> 
-            Nombre de sexes : <input type="range" id="champ_nb_sexes" oninput="updateRanges()" min="2" max="30" /> <a id="paragraphe_nb_sexes"></a> </br>
-            Nombre de lignes : <input type="range" id="champ_nb_lignes" oninput="updateRanges()" min="3" max="50" /> <a id="paragraphe_nb_lignes"></a> </br>
-            Nombre de colonnes : <input type="range" id="champ_nb_colonnes" oninput="updateRanges()" min="3" max="50" /> <a id="paragraphe_nb_colonnes"></a> </br>
-            Nombre d'itérations : <input type="number" id="champ_nb_iterations" min="10" max="100000"/> </br>
+            <h2>Création d'une partie</h2>
+            <div class="axe">
+                Nombre de joueurs : <a id="paragraphe_nb_joueurs"></a>
+                <input type="range" id="champ_nb_joueurs" oninput="updateRanges()" min="1" max="4" />
+            </div>
+            <div class="axe">
+                Nombre d'entités par joueur : <a id="paragraphe_nb_entites_par_joueur"></a>
+                <input type="range" id="champ_nb_entites_par_joueur" oninput="updateRanges()" min="1" max="100" />
+            </div>
+            <div class="axe">
+                Nombre d'itérations : <a id="paragraphe_nb_iterations"></a>
+                <input type="range" id="champ_nb_iterations" oninput="updateRanges()" min="10" max="100000" />
+            </div>
+            <div class="axe">
+                Nombre de sexes : <a id="paragraphe_nb_sexes"></a>
+                <input type="range" id="champ_nb_sexes" oninput="updateRanges()" min="2" max="30" />
+            </div>
+            <div class="axe">
+                Nombre de lignes : <a id="paragraphe_nb_lignes"></a>
+                <input type="range" id="champ_nb_lignes" oninput="updateRanges()" min="3" max="50" />
+            </div>
+            <div class="axe">
+                Nombre de colonnes : <a id="paragraphe_nb_colonnes"></a>
+                <input type="range" id="champ_nb_colonnes" oninput="updateRanges()" min="3" max="50" />
+            </div>
         </div>
-        
-        <input type="button" id="bouton_jouer" onclick="demanderJoindrePartie()" value="Jouer" />
+        <div id="bouton_jouer" class="bouton" onclick="demanderJoindrePartie()">
+            <h3>Jouer</h3>
+        </div>
     </header>
     <script>updateRanges();</script>
 
     <div id="tablier"></div>
 
     <div id="menu_pouvoirs" style="display:none">
-        <h3>Pouvoirs</h3>
-        <div class="bouton" onclick="setPouvoir(0)">
+        <h2>Pouvoirs</h2>
+        <div class="bouton" onclick="setPouvoir(0)" id="bouton_pouvoir_0">
             <h3>Total Energies (40pts)</h3>
-            <a>Appuyez sur une prairie pour que vos entités y déploient une entreprise pétrolière</a> </br>
+            <p>Appuyez sur une prairie pour que vos entités y déploient une entreprise pétrolière</p>
         </div>
-        <div class="bouton" onclick="setPouvoir(1)">
+        <div class="bouton" onclick="setPouvoir(1)" id="bouton_pouvoir_1">
             <h3>Abracadabra (50pts)</h3>
-            <a>Appuyez sur un rocher et une eau/prairie pour les échanger</a> </br>
+            <p>Appuyez sur un rocher et une eau/prairie pour les échanger</p>
         </div>
-        <div class="bouton" onclick="setPouvoir(2)">
+        <div class="bouton" onclick="setPouvoir(2)" id="bouton_pouvoir_2">
             <h3>It's big brain time (75pts)</h3>
-            <a>Vos entités évaluent 25 cases en plus avant de faire leur choix</a> </br>
+            <p>Vos entités évaluent 25 cases en plus avant de faire leur choix</p>
         </div>
-        <div class="bouton" onclick="setPouvoir(3)">
+        <div class="bouton" onclick="setPouvoir(3)" id="bouton_pouvoir_3">
             <h3>Vision d'ensemble (100pts)</h3>
-            <a>Vos entités peuvent voir une case plus loin</a> </br>
+            <p>Vos entités peuvent voir une case plus loin</p>
         </div>
-        <div class="bouton" onclick="setPouvoir(4)">
+        <div class="bouton" onclick="setPouvoir(4)" id="bouton_pouvoir_4">
             <h3>It's a hoax (130pts)</h3>
-            <a>Vos entités ignorent le réchauffement climatique chaque prairie a une chance sur deux de disparaître</a> </br>
+            <p>Vos entités ignorent le réchauffement climatique chaque prairie a une chance sur deux de disparaître</p>
         </div>
-        <div class="bouton" onclick="setPouvoir(5)">
+        <div class="bouton" onclick="setPouvoir(5)" id="bouton_pouvoir_5">
             <h3>Désormais inéluctable (200pts)</h3>
-            <a>Vos entités obtiennent un gant d'infinité et font disparaître en moyenne la moitié des entités adverses</a> </br>
+            <p>Vos entités obtiennent un gant d'infinité et font disparaître en moyenne la moitié des entités adverses</p>
         </div>
-        <div class="bouton" onclick="setPouvoir(6)">
+        <div class="bouton" onclick="setPouvoir(6)" id="bouton_pouvoir_6">
             <h3>The Superintelligent Will (500pts)</h3>
-            <a>Vos entités ignorent les conseils des chercheurs en sécurité de l'IA et développent une superintelligence</a> </br>
+            <p>Vos entités ignorent les conseils des chercheurs en sécurité de l'IA et développent une superintelligence</p>
         </div>
     </div>
 
     <div id="menu_fin_superintelligence" style="display:none">
         <h1>Toutes les entités sont mortes</h1>
-        <p>
-            Selon <a href="https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/">le dernier sondage de Katja Grace</a>,
-            48% des chercheurs en IA donnent au moins 10% de chances quant au fait que l'IA causera l'extinction de l'humanité.
-            Ainsi, en négligeant les risques, les entités sont toutes mortes avant même d'avoir eu le temps de le réaliser.
-        </p>
+        <p>Selon <a href="https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/">le dernier sondage de Katja Grace</a>, 48% des chercheurs en IA donnent au moins 10% de chances quant au fait que l'IA causera l'extinction de l'humanité. Ainsi, en négligeant les risques, les entités sont toutes mortes avant même d'avoir eu le temps de le réaliser.</p></br>
+        
+        <p>La plupart des gens pensent initialement que, si une superintelligence est en effet intelligente, alors elle serait capable de déterminer quelle est la Vraie Éthique, et déciderait donc de ne pas accomplir des objectifs stupides. Cependant, même si la première proposition est vraie, elle n'implique pas la deuxième. Nous savons que, si nous appliquons la descente de gradient sur un modèle pendant suffisamment longtemps, celui-ci va converger vers la stratégie optimale de sa fonction de récompenses. Autrement dit, nous savons que l'on peut faire une superintelligence pour n'importe quelle fonction de récompense.</p></br>
+        
+        <p>Cela est vrai même si la fonction de récompenses donne de hauts scores à des états du monde qui nous paraissent stupides. En plus de cela, puisque pour l'extrême majorité des fonctions de récompenses, leur argument maximal nous semble être complètement aléatoire (à cause de l'overfitting, des attaques adversariales, de la loi de Goodhart, ou de n'importe quel autre terme pour désigner la suroptimisation), nous devrions nous attendre à ce que, par défaut, les superintelligences essaient d'accomplir des objectifs nous semblant complètement aléatoires et dénués de sens (comme n'importe quel exemple adversarial). Cependant, pourquoi cela a t-il causé l'extinction de toutes les entités ?</p></br>
+        
+        <p>Imaginez que vous avez un agent, un environnement, et une fonction de récompenses. La fonction de récompenses prend en entrée un environnement, et renvoie en sortie un score. L'agent prend en entrée un environnement, et renvoie une séquence d'actions qui modifie l'environnement d'une manière à ce qu'il ait le meilleur score selon la fonction de récompenses. À cause des exemples adversariaux, l'environnement résultant nous sera complètement inattendu. Par exemple, si l'environnement est une image, et que les actions sont des petites modifications de cette image, alors l'environnement résultant sera un bruit blanc complet, comme illustré dans la figure 13 de <a href="https://arxiv.org/pdf/1412.1897.pdf">cet article</a>.</p></br>
+        
+        <figure>
+            <img src="./nguyen_picture.png" width="100%" height="100%">
+            <figcaption>Lorsque l'on utilise une fonction de récompenses pour récompenser une IA, et qu'on la laisse tourner suffisamment longtemps, celle-ci trouvera et renverra des exemples adversariaux. Ces images sont mal classifiées à plus de 99,99% par la fonction de récompenses, permettant ainsi d'obtenir bien plus de récompenses qu'en renvoyant une image n'étant pas un exemple adversarial.</figcaption>
+        </figure>
+        
+        <p>Pour donner un exemple un peu plus parlant mais n'ayant pas encore pu être testé empiriquement (nous n'avons pas encore d'IA suffisamment intelligentes pour faire cela), si l'environnement est un monde Minecraft, et que les actions sont des touches de clavier contrôlant un personnage, alors l'environnement résultant sera un monde Minecraft entièrement rempli de blocs aléatoires.</p>
+        
+        <figure>
+            <img src="./skygrid.jpeg" width="100%" height="100%">
+            <figcaption>Lorsque l'on utilise une fonction de récompenses pour donner un objectif à une IA dans un monde Minecraft, on devrait s'attendre à ce que le résultat soit un exemple adversarial. Cette image est purement illustrative, et ce phénomène n'a pas encore pu être observé, car il est encore très difficile pour une IA de jouer aussi bien à ce jeu.</figcaption>
+        </figure>
+        
+        <p>Si vous êtes comme moi, vous ne voudriez probablement pas que notre univers ressemble à une de ces deux images. Voici la raison pour laquelle, en développant une superintelligence, les entités sont toutes mortes sans laisser de trace.</p>
     </div>
 </body>
 </html>
