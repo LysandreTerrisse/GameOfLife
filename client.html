@@ -12,8 +12,6 @@
     <script src="./fonctions_de_pouvoirs.js"></script>
     <title>Le jeu de la vie</title>
     <script>
-    //var {genererTerrain, genererEntites, tick} = require("./fonctions_de_jeu");
-    //var {enleverInputsCreationPartie, enleverInputsDeConnexion} = require("./fonctions_de_dessin");
     var socket = io();
     
     var infos;
@@ -35,14 +33,16 @@
         //S'il y a au moins un joueur
         if(infos.liste_joueurs.length != 0) {
             //On modifie l'interface
-            enleverInputsCreationPartie(); // On enlève les éléments spécifiques au premier joueur
+            enleverMenuCreationPartie();
             document.getElementById("paragraphe_liste_joueurs").innerHTML = infos.liste_joueurs.join(" "); // On affiche la liste des joueurs
+            ajouterMenuPouvoirs();
             
             // Si l'on a le bon nombre de joueurs
             if(infos.liste_joueurs.length == infos.nb_joueurs_max) {
+                enleverMenuConnexion();
                 infos.liste_terrain = genererTerrain(infos.nb_joueurs_max, infos.nb_lignes, infos.nb_colonnes);
                 infos.liste_entites = genererEntites(infos)
-                infos.liste_scores  = Array(infos.liste_joueurs.length).fill(0);
+                infos.liste_points  = Array(infos.liste_joueurs.length).fill(0);
                 dessinerPremiereFois(infos.liste_terrain, infos.liste_entites, 10, 30);
                 boucle(infos)// On commence la partie
             }
@@ -68,7 +68,7 @@
     /* S'exécute quand on appuie sur le bouton "Jouer" */
     function demanderJoindrePartie() {
         // On enlève les inputs de connexion
-        enleverInputsDeConnexion();
+        enleverMenuConnexion();
         // On extrait les informations des champs
         let [nom_joueur, force, perception, taux_reproduction, nb_joueurs, nb_entites_par_joueur, nb_iterations, nb_sexes, nb_lignes, nb_colonnes] = extraireDepuisInterface();
         // On affiche le nom du joueur
@@ -87,8 +87,7 @@
             nb_lignes: nb_lignes,
             nb_colonnes: nb_colonnes
         }
-
-        // On envoie une requête au serveur
+        
         socket.emit('ajouter_joueur', infos_client);
     }
     
@@ -96,37 +95,39 @@
 </head>
 <body>
     <header>
+        <div id="menu_principal">
+            <h1>Jeu de la vie</h1>
+            Nom du joueur : <a id="paragraphe_nom_joueur"></a> </br>
+            Liste des joueurs : <a id="paragraphe_liste_joueurs"></a> </br>
+            Liste des points : <a id="paragraphe_liste_points"></a> </br>
+            <h2 id="paragraphe_nom_vainqueur"></h2>
+        </div>
         <div id="menu_connexion">
             <h3>Connexion</h3>
             Nom du joueur : <input type="text" id="champ_nom_joueur" /> </br>
-            Nombre de points non répartis : <a id="paragraphe_points_non_repartis"></a> / 9 </br> <!-- À implémenter -->
-            Force des créatures : <input type="range" id="champ_force" oninput="updateStats()" min="1" max="5" value="3" /> <a id="paragraphe_force"></a> </br> <!-- À implémenter -->
-            Perception des créatures : <input type="range" id="champ_perception" oninput="updateStats()" min="1" max="5" value="3" /> <a id="paragraphe_perception"></a> </br> <!-- À implémenter -->
-            Taux de reproduction des créatures : <input type="range" id="champ_taux_reproduction" oninput="updateStats()" min="1" max="5" value="3" /> <a id="paragraphe_taux_reproduction"></a> </br> <!-- À implémenter -->
+            Nombre de points non répartis : <a id="paragraphe_points_non_repartis"></a> / 9 </br>
+            Force des créatures : <input type="range" id="champ_force" oninput="updateRanges()" min="1" max="5" value="3" /> <a id="paragraphe_force"></a> </br>
+            Perception des créatures : <input type="range" id="champ_perception" oninput="updateRanges()" min="1" max="5" value="3" /> <a id="paragraphe_perception"></a> </br>
+            Taux de reproduction des créatures : <input type="range" id="champ_taux_reproduction" oninput="updateRanges()" min="1" max="5" value="3" /> <a id="paragraphe_taux_reproduction"></a> </br>
         </div>
         <div id="menu_creation_partie">
             <h3>Création d'une partie</h3>
-            Nombre de joueurs : <input type="number" id="champ_nb_joueurs" /></br>
-            Nombre d'entités par joueur : <input type="number" id="champ_nb_entites_par_joueur" /></br>
-            Nombre d'itérations : <input type="number" id="champ_nb_iterations" /></br>
-            Nombre de sexes : <input type="number" id="champ_nb_sexes" /></br>
-            Nombre de lignes : <input type="number" id="champ_nb_lignes" /></br>
-            Nombre de colonnes : <input type="number" id="champ_nb_colonnes" /></br>
-        </div>
-        <div id="menu_partie">
-            <h3>Jeu de la vie</h3>
-            Nom du joueur : <a id="paragraphe_nom_joueur"></a> </br>
-            Liste des joueurs : <a id="paragraphe_liste_joueurs"></a> </br>
-            Liste des scores : <a id="paragraphe_liste_scores"></a> </br>
+            Nombre de joueurs : <input type="range" id="champ_nb_joueurs" oninput="updateRanges()" min="1" max="4" /> <a id="paragraphe_nb_joueurs"></a> </br>
+            Nombre d'entités par joueur : <input type="range" id="champ_nb_entites_par_joueur" oninput="updateRanges()" min="1" max="100" /> <a id="paragraphe_nb_entites_par_joueur"></a> </br> 
+            Nombre de sexes : <input type="range" id="champ_nb_sexes" oninput="updateRanges()" min="2" max="30" /> <a id="paragraphe_nb_sexes"></a> </br>
+            Nombre de lignes : <input type="range" id="champ_nb_lignes" oninput="updateRanges()" min="3" max="50" /> <a id="paragraphe_nb_lignes"></a> </br>
+            Nombre de colonnes : <input type="range" id="champ_nb_colonnes" oninput="updateRanges()" min="3" max="50" /> <a id="paragraphe_nb_colonnes"></a> </br>
+            Nombre d'itérations : <input type="number" id="champ_nb_iterations" min="10" max="100000"/> </br>
         </div>
         
         <input type="button" id="bouton_jouer" onclick="demanderJoindrePartie()" value="Jouer" />
     </header>
-    <script>updateStats();</script>
+    <script>updateRanges();</script>
 
     <div id="tablier"></div>
 
-    <div id="menu_pouvoirs">
+    <div id="menu_pouvoirs" style="display:none">
+        <h3>Pouvoirs</h3>
         <input type="button" onclick="setPouvoir(0)" id="bouton_total_energies" value="Total Energies (40pts)" /> <a>Appuyez sur une prairie pour que vos entités y déploient une entreprise pétrolière</a> </br>
         <input type="button" onclick="setPouvoir(1)" id="bouton_abracadabra" value="Abracadabra (50pts)" /> <a>Appuyez sur un rocher et une eau/prairie pour les échanger</a> </br>
         <input type="button" onclick="setPouvoir(2)" id="bouton_big_brain_time" value="It's big brain time (75pts)" /> <a>Vos entités évaluent 25 cases en plus avant de faire leur choix</a> </br>
