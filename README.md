@@ -46,3 +46,19 @@ Lorsqu'une entité apparait, ou lorsqu'une entité est censée apparaître, le j
 ## Victoire
 
 Un joueur gagne si, au moment de la fin de la partie, il a plus d'entités sur le terrain que les autres joueurs. Si plusieurs joueurs sont à égalité (comme dans le cas où toutes les entités meurent avant la fin de la partie), on départage les joueurs selon leurs points. S'ils sont encore en égalité, ils ont tous gagnés.
+
+## Algorithme de décision et le facteur `intelligence`
+
+Notre entité a un algorithme de décision assez simple :
+- Si sa satiété et hydratation ne sont pas en dessous de 6, et que la tanière est visible par l'entité, alors l'entité se dirige vers sa tanière.
+- Sinon, si sa satiété et son hydratation ne sont pas en dessous de 5, et qu'elle est dans la tanière, alors elle reste dans la tanière.
+- Sinon, elle détermine quelle est la ressource qu'elle a actuellement le plus besoin, la cherche dans n cases aléatoires de la grille, et se dirige vers celle la plus proche dans son champ de vision.
+- Si elle ne trouve pas la ressource prioritaire dans son champ de vision, elle fait la même chose pour la ressource non prioritaire.
+- Si elle n'en trouve pas non plus, elle agit aléatoirement.
+
+Nous pouvons ainsi contrôler l'efficacité des entités seulement en augmentant ou diminuant le nombre n. C'est pour cela que nous avons appelé ce nombre le facteur `intelligence`.
+
+
+
+
+
