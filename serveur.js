@@ -126,4 +126,6 @@ app.get("/fonctions_de_pouvoirs.js", function(request, response) {
     response.sendFile("fonctions_de_pouvoirs.js", {root: __dirname});
 });
 
-
+app.get("/style.css", function(request, response) {
+    response.sendFile("style.css", {root: __dirname});
+});
