@@ -45,8 +45,8 @@ io.on("connection", socket => {
     socket.on("ajouter_joueur", (infos_client) => { // Quand un utilisateur veut jouer
         if(infos.liste_joueurs.length == 0) { // Si c'est le premier utilisateur à vouloir jouer
             infos.nb_joueurs_max        = borner(infos_client.nb_joueurs_max, 1, 4); // Alors il nous a aussi envoyé un nombre de joueurs max
-            infos.nb_entites_par_joueur = borner(infos_client.nb_entites_par_joueur, 1, 200); // Et un nombre d'entités par joueur
-            infos.nb_iterations_max     = borner(infos_client.nb_iterations_max, 10, 10000000); // Et un nombre d'itérations maximal
+            infos.nb_entites_par_joueur = borner(infos_client.nb_entites_par_joueur, 1, 100); // Et un nombre d'entités par joueur
+            infos.nb_iterations_max     = borner(infos_client.nb_iterations_max, 10, 100000); // Et un nombre d'itérations maximal
             infos.nb_sexes              = borner(infos_client.nb_sexes, 2, 30) // Et un nombre de sexes
             infos.nb_lignes             = borner(infos_client.nb_lignes, 3, 50); // Et un nombre de lignes
             infos.nb_colonnes           = borner(infos_client.nb_colonnes, 3, 50); // Et un nombre de colonnes
@@ -80,7 +80,7 @@ io.on("connection", socket => {
     socket.on("envoyer_action", (identifiant_secret, pouvoir, liste_positions_cliquees) => {
         // On vérifie que l'identifiant secret correspond bien à un joueur.
         // Le reste (vérifier que le joueur peut en effet utiliser ce pouvoir avec ces tuiles) sera
-        // vérifié par les clients qui, contrairement au serveur, ont la liste des tuiles et les scores.
+        // vérifié par les clients qui, contrairement au serveur, ont la liste des tuiles et les points.
         let numero_joueur = infos_privees.identifiants_secrets.indexOf(identifiant_secret);
         
         //On stocke le pouvoir envoyé avec le moment où il a été fait
