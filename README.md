@@ -22,13 +22,12 @@ Pour que tous les utilisateurs aient le même déroulement du jeu, il faut que l
 
 Lorsqu'un joueur essaie de faire une action, il envoie au serveur l'action qu'il veut faire, puis le serveur stockera cette action et fera un broadcast, puis les autres joueurs prendront en compte cette action lors du calcul du déroulement du jeu. Lorsqu'un utilisateur arrive en plein milieu de la partie, il demande au serveur les paramètres initiaux ainsi que la liste des actions effectuées. À partir de cela, il peut reconstruire très rapidement la partie pour rattraper son retard et suivre la partie en direct. Au début, nous avions eu peur que ce processus prendrait trop de temps, mais en réalité, un utilisateur peut rattraper une heure de retard en moins de deux secondes.
 
-## Et si...
-
+## Qualités
 ### Et si un utilisateur essaie de tricher ?
-Si un joueur essaie de faire un mouvement illégal, les autres joueurs regarderont le mouvement qu'il a essayé de faire, réaliseront que ce mouvement est illégal, et l'ignoreront.
+Si un joueur essaie de faire un mouvement illégal, les autres joueurs regarderont le mouvement qu'il a essayé de faire, réaliseront que ce mouvement est illégal, et l'ignoreront. Nous avons bien fait en sorte que chaque requête reçue de la part d'un autre utilisateur soit vérifiée. Même s'il est quasiment impossible de filtrer toutes les requêtes malveillantes (en pratique c'est possible, [comme dans cet article](https://arxiv.org/abs/1304.5087v4)), nous pensons que nos filtrages permettrons d'empêcher la plupart des fausses requêtes.
 
 ### Et si le serveur crashait ?
-Si le serveur crashe, les joueurs ne peuvent plus faire d'actions, mais peuvent toujours continuer de regarder la partie pour voir qui va gagner.
+Si le serveur crashe, les joueurs ne peuvent plus faire d'actions, mais peuvent toujours continuer de regarder la partie pour voir qui va gagner. Cela peut mieux se voir quand on quitte volontairement le serveur.
 
 # Défauts
 
