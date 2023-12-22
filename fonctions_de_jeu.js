@@ -274,8 +274,6 @@ function finPartie(liste_entites, liste_points, liste_joueurs) {
     liste_numeros_gagnants = liste_numeros_gagnants.filter((numero) => liste_points[numero] == point_maximal);
     //On fait correspondre les numéros gagnants avec les noms des joueurs
     liste_gagnants = liste_numeros_gagnants.map((numero) => { return liste_joueurs[numero]; })
-    console.log("liste_gagnants", liste_numeros_gagnants)
     //On affiche la liste des gagnants
     document.getElementById("paragraphe_noms_gagnants").innerHTML = liste_gagnants.join(" et ") + (liste_gagnants.length == 1 ? " a " : " ont ") + "gagné !";
-    console.log(liste_gagnants.join(" et ") + (liste_gagnants.length == 1 ? " a " : " ont ") + "gagné !");
 }
