@@ -27,10 +27,10 @@ Fait :
     - Limiter le nombre maximal d'entités par joueur
     - Faire un score
     - Un joueur pourra déplacer un hexagone prairie ou eau avec un hexagone rocher (pendant l'évolution)
+    - Empêcher l'appui de boutons lorsque les paramètres sont invalides
+    - Enlever des points lorsque l'on fait une action
 
 À faire :
-    - Empêcher l'appui de boutons lorsque les paramètres sont invalides
     - Le gagnant est celui qui a le plus de créatures
-    - Enlever des points lorsque l'on fait une action
     - Faire un long texte sur la sécurité de l'IA
     - Faire le CSS
