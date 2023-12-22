@@ -26,6 +26,10 @@ Lorsqu'un joueur essaie de faire une action, il envoie au serveur l'action qu'il
 ### Et si un utilisateur essaie de tricher ?
 Si un joueur essaie de faire un mouvement illégal, les autres joueurs regarderont le mouvement qu'il a essayé de faire, réaliseront que ce mouvement est illégal, et l'ignoreront. Nous avons bien fait en sorte que chaque requête reçue de la part d'un autre utilisateur soit vérifiée. Même s'il est quasiment impossible de filtrer toutes les requêtes malveillantes (en pratique c'est possible, [comme dans cet article](https://arxiv.org/abs/1304.5087v4)), nous pensons que nos filtrages permettront d'empêcher la plupart des fausses requêtes.
 
+### Et si un utilisateur essaie d'usurper l'identité d'un joueur ?
+
+Lorsqu'un utilisateur entre dans la partie, le serveur lui envoie un identifiant secret généré purement aléatoirement. Ainsi, lorsqu'un utilisateur fait une action, il doit prouver son identité en envoyant, en plus de l'action, son identifiant secret.
+
 ### Et si le serveur crashait ?
 Si le serveur crashe, les joueurs ne peuvent plus faire d'actions, mais peuvent toujours continuer de regarder la partie pour voir qui va gagner. Cela peut mieux se voir quand on quitte volontairement le serveur.
 
@@ -58,7 +62,10 @@ Notre entité a un algorithme de décision assez simple :
 
 Nous pouvons ainsi contrôler l'efficacité des entités seulement en augmentant ou diminuant le nombre n. C'est pour cela que nous avons appelé ce nombre le facteur `intelligence`.
 
+## Conclusion
+
+Ce projet a été très amusant à faire. Nous avons réussi à implémenter toutes les fonctionnalités que l'on nous avait demandé, et nous avons ajouté d'autres fonctionnalité comme les pouvoirs, les points, le facteur intelligence, l'indépendance du client, et l'identification sécurisée. Finalement, nous avons réussi à avoir un rendu CSS qui nous satisfait grandement.
 
 
 
-
+(Aucune IA n'a été utilisée pour ce projet)
