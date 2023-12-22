@@ -22,14 +22,14 @@ Pour que tous les utilisateurs aient le même déroulement du jeu, il faut que l
 
 Lorsqu'un joueur essaie de faire une action, il envoie au serveur l'action qu'il veut faire, puis le serveur stockera cette action et fera un broadcast, puis les autres joueurs prendront en compte cette action lors du calcul du déroulement du jeu. Lorsqu'un utilisateur arrive en plein milieu de la partie, il demande au serveur les paramètres initiaux ainsi que la liste des actions effectuées. À partir de cela, il peut reconstruire très rapidement la partie pour rattraper son retard et suivre la partie en direct. Au début, nous avions eu peur que ce processus prendrait trop de temps, mais en réalité, un utilisateur peut rattraper une heure de retard en moins de deux secondes.
 
-## Qualités
+## Qualités de l'implémentation côté client
 ### Et si un utilisateur essaie de tricher ?
 Si un joueur essaie de faire un mouvement illégal, les autres joueurs regarderont le mouvement qu'il a essayé de faire, réaliseront que ce mouvement est illégal, et l'ignoreront. Nous avons bien fait en sorte que chaque requête reçue de la part d'un autre utilisateur soit vérifiée. Même s'il est quasiment impossible de filtrer toutes les requêtes malveillantes (en pratique c'est possible, [comme dans cet article](https://arxiv.org/abs/1304.5087v4)), nous pensons que nos filtrages permettront d'empêcher la plupart des fausses requêtes.
 
 ### Et si le serveur crashait ?
 Si le serveur crashe, les joueurs ne peuvent plus faire d'actions, mais peuvent toujours continuer de regarder la partie pour voir qui va gagner. Cela peut mieux se voir quand on quitte volontairement le serveur.
 
-## Défauts
+## Défauts de l'implémentation côté client
 
 Le seul défaut que nous pouvons voir est dans le cas où un utilisateur fait une action, et que deux autres utilisateurs ne la reçoivent pas au même tick. Dans ce cas, un des utilisateurs considèrera le mouvement comme invalide (car il n'est pas arrivé à temps), mais l'autre utilisateur le considèrera valide. Ainsi, deux utilisateurs pourraient potentiellement se désynchroniser. Pour se resynchroniser, un utilisateur peut recharger la page, et ainsi tout recalculer.
 
@@ -42,3 +42,7 @@ Puisque l'algorithme de décision de nos entités est efficace, en suivant les r
 ## Points et pouvoirs
 
 Lorsqu'une entité apparait, ou lorsqu'une entité est censée apparaître, le joueur de cette entité gagne un point. Avec suffisamment de points, les joueurs peuvent utiliser des pouvoirs. Cela permet de donner un intérêt à essayer de générer un baby-boom. Nous avons donc sept pouvoirs, que nous ne spoileront pas ici.
+
+## Victoire
+
+Un joueur gagne si, au moment de la fin de la partie, il a plus d'entités sur le terrain que les autres joueurs. Si plusieurs joueurs sont à égalité (comme dans le cas où toutes les entités meurent avant la fin de la partie), on départage les joueurs selon leurs points. S'ils sont encore en égalité, ils ont tous gagnés.
