@@ -29,16 +29,16 @@ Si un joueur essaie de faire un mouvement illégal, les autres joueurs regardero
 ### Et si le serveur crashait ?
 Si le serveur crashe, les joueurs ne peuvent plus faire d'actions, mais peuvent toujours continuer de regarder la partie pour voir qui va gagner. Cela peut mieux se voir quand on quitte volontairement le serveur.
 
-# Défauts
+## Défauts
 
 Le seul défaut que nous pouvons voir est dans le cas où un utilisateur fait une action, et que deux autres utilisateurs ne la reçoivent pas au même tick. Dans ce cas, un des utilisateurs considèrera le mouvement comme invalide (car il n'est pas arrivé à temps), mais l'autre utilisateur le considèrera valide. Ainsi, deux utilisateurs pourraient potentiellement se désynchroniser. Pour se resynchroniser, un utilisateur peut recharger la page, et ainsi tout recalculer.
 
 Ce bug n'est arrivé que très rarement pour nous, mais nous pensons que, si le jeu était mis sur un serveur en ligne, il deviendrait très fréquent. Pour corriger cela, il faudrait remonter dans le calcul jusqu'à la désynchronisation, pour ensuite redescendre jusqu'au moment actuel. Même si cela semble largement faisable (il suffit de garder une trace du calcul de la minute précédente, comme en stockant une seule backup), la correction de ce bug semblait bien hors de portée de ce projet, et nous avons donc décidé de l'ignorer.
 
-# Baby-boom
+## Baby-boom
 
 Puisque l'algorithme de décision de nos entités est efficace, en suivant les règles du jeu à la lettre, nos entités faisaient un "baby-boom". Ainsi, des dizaines de milliers d'entités apparaissaient en moins d'une cinquantaine d'itérations (donc en moins de cinq secondes). Nous avons donc décidé de limiter le nombre d'entités par joueur à 100. Cependant, il n'y avait donc plus aucun intérêt à essayer de générer un baby-boom. Nous avons donc implémenté un système de points.
 
-# Points et pouvoirs
+## Points et pouvoirs
 
 Lorsqu'une entité apparait, ou lorsqu'une entité est censée apparaître, le joueur de cette entité gagne un point. Avec suffisamment de points, les joueurs peuvent utiliser des pouvoirs. Cela permet de donner un intérêt à essayer de générer un baby-boom. Nous avons donc sept pouvoirs, que nous ne spoileront pas ici.
