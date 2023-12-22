@@ -35,6 +35,19 @@ function tuileCliquee() {
     }
 }
 
+/* Active ou désactive les boutons de pouvoir selon le score du client */
+function updateBoutonsDePouvoir(liste_points) {
+    let mes_points = liste_points[getNumeroJoueur()];
+    activerBouton("bouton_pouvoir_0", (mes_points >= 40 ), "setPouvoir(0)");
+    activerBouton("bouton_pouvoir_1", (mes_points >= 50 ), "setPouvoir(1)");
+    activerBouton("bouton_pouvoir_2", (mes_points >= 75 ), "setPouvoir(2)");
+    activerBouton("bouton_pouvoir_3", (mes_points >= 100), "setPouvoir(3)");
+    activerBouton("bouton_pouvoir_4", (mes_points >= 130), "setPouvoir(4)");
+    activerBouton("bouton_pouvoir_5", (mes_points >= 200), "setPouvoir(5)");
+    activerBouton("bouton_pouvoir_6", (mes_points >= 500), "setPouvoir(6)");
+    
+}
+
 /* Garantit que le pouvoir est valide (entre 0 et 6) et que la liste des positions a les   */
 /* bonnes dimensions (deux chiffres par position, et 0, 1, ou 2 position selon le pouvoir) */
 function verifierAction(action, nb_lignes, nb_colonnes) {
@@ -82,22 +95,23 @@ function executerAction(action, liste_terrain, liste_entites, liste_points) {
         case (pouvoir==5 && score >= 200) : liste_points[numero_utilisateur] -= 200; DesormaisIneluctable(liste_entites, numero_utilisateur); break;
         case (pouvoir==6 && score >= 500) : liste_points[numero_utilisateur] -= 500; TheSuperintelligentWill(liste_entites); break;
     }
+    
+    //On met à jour les boutons de pouvoir (puisque les points ont changé)
+    updateBoutonsDePouvoir(liste_points);
+    //On redessine tout
     dessinerTout(liste_terrain, liste_entites, 10, 30)
 }
 
 function TotalEnergies(liste_positions, liste_terrain) {
-    console.log("Total Energies");
     let [i, j] = liste_positions[0];
     liste_terrain[i][j] = "R"
 }
 
 function Abracadabra(liste_positions, liste_terrain) {
-    console.log("Abracadabra");
     permuter(liste_terrain, liste_positions[0], liste_positions[1]);
 }
 
 function ItsBigBrainTime(liste_entites, numero_utilisateur) {
-    console.log("It's big brain time");
     for(let entite of liste_entites) {
         if(entite.tribu == numero_utilisateur) {
             entite.intelligence += 25;
@@ -106,7 +120,6 @@ function ItsBigBrainTime(liste_entites, numero_utilisateur) {
 }
 
 function VisionEnsemble(liste_entites, numero_utilisateur) {
-    console.log("Vision d'ensemble");
     for(let entite of liste_entites) {
         if(entite.tribu == numero_utilisateur) {
             entite.perception += 1;
@@ -115,7 +128,6 @@ function VisionEnsemble(liste_entites, numero_utilisateur) {
 }
 
 function ItsAHoax(liste_terrain) {
-    console.log("It's a hoax");
     for(let i=0; i<liste_terrain.length; i++) {
         for(let j=0; j<liste_terrain[0].length; j++) {
             if(liste_terrain[i][j] == "P" && randint(0, 1)) {
@@ -126,7 +138,6 @@ function ItsAHoax(liste_terrain) {
 }
 
 function DesormaisIneluctable(liste_entites, numero_utilisateur) {
-    console.log("Désormais inéluctable");
     for(let i=liste_entites.length-1; i>=0; i--) {
         if(liste_entites[i].tribu != numero_utilisateur && randint(0, 1)) {
             liste_entites.splice(i, 1);
@@ -135,7 +146,6 @@ function DesormaisIneluctable(liste_entites, numero_utilisateur) {
 }
 
 function TheSuperintelligentWill(liste_entites) {
-    console.log("The Superintelligent Will");
     liste_entites.splice(0, liste_entites.length);
     
     enleverMenuCreationPartie();
