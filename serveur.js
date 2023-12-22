@@ -5,7 +5,7 @@ const server = http.createServer(app);
 const io = new require("socket.io")(server);
 
 server.listen(8888, () => {
-    console.log("Serveur démarré");
+    console.log("Serveur démarré sur le port 8888");
 });
 
 var infos = {
@@ -62,10 +62,10 @@ io.on("connection", socket => {
             infos.liste_perceptions.push(borner(infos_client.perception, 1, Math.min(5, 8 - infos.liste_forces[n-1])));
             infos.liste_taux_reproduction.push(borner(infos_client.taux_reproduction, 1, Math.min(5, 9 - infos.liste_forces[n-1] - infos.liste_perceptions[n-1])));
             
-            // On lui génère un identifiant secret dans [0;999999] que l'on stocke et lui renvoie
+            // On lui génère un identifiant secret dans [0;999999] que l'on stocke et lui renvoie avec son numéro d'utilisateur
             let identifiant_secret = Math.floor(Math.random()*1000000)
             infos_privees.identifiants_secrets.push(identifiant_secret)
-            socket.emit("identifiant_secret", identifiant_secret); 
+            socket.emit("identifiant_secret", identifiant_secret, infos.liste_joueurs.length-1);
             
             //Si c'est le dernier joueur à pouvoir entrer, la partie débute maintenant
             if(infos.liste_joueurs.length==infos.nb_joueurs_max) {
@@ -128,4 +128,12 @@ app.get("/fonctions_de_pouvoirs.js", function(request, response) {
 
 app.get("/style.css", function(request, response) {
     response.sendFile("style.css", {root: __dirname});
+});
+
+app.get("/nguyen_picture.png", function(request, response) {
+    response.sendFile("nguyen_picture.png", {root: __dirname});
+});
+
+app.get("/skygrid.jpeg", function(request, response) {
+    response.sendFile("skygrid.jpeg", {root: __dirname});
 });
