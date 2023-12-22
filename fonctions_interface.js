@@ -4,7 +4,7 @@ function enleverMenuCreationPartie() {
 
 function enleverMenuConnexion() {
     document.getElementById("menu_connexion").style.display = "none";
-    document.getElementById("bouton_jouer").type = "hidden"; // On enlève le bouton "Jouer" même s'il n'est pas dans le même <div>
+    document.getElementById("bouton_jouer").style.display = "none"; // On enlève le bouton "Jouer" même s'il n'est pas dans le même <div>
 }
 
 function ajouterMenuPouvoirs() {
@@ -37,6 +37,12 @@ function extraireDepuisInterface() {
     return [nom_joueur, force, perception, taux_reproduction, nb_joueurs, nb_entites_par_joueur, nb_iterations, nb_sexes, nb_lignes, nb_colonnes];
 }
 
+function activerBouton(id_bouton, condition, fonction_serialisee) {
+    document.getElementById(id_bouton).setAttribute("onclick", condition ? fonction_serialisee : "")
+    document.getElementById(id_bouton).style.backgroundColor = (condition ? "#BBB" : "#555")
+    document.getElementById(id_bouton).style.textShadow = (condition ? "#FFF 1px 0 2px" : "none");
+}
+
 /* S'exécute quand l'un des input de type range change */
 function updateRanges() {
     //On extrait les informations de l'interface
@@ -52,11 +58,12 @@ function updateRanges() {
     document.getElementById("paragraphe_taux_reproduction"    ).innerHTML = taux_reproduction;
     document.getElementById("paragraphe_nb_joueurs"           ).innerHTML = nb_joueurs;
     document.getElementById("paragraphe_nb_entites_par_joueur").innerHTML = nb_entites_par_joueur;
+    document.getElementById("paragraphe_nb_iterations"        ).innerHTML = nb_iterations;
     document.getElementById("paragraphe_nb_sexes"             ).innerHTML = nb_sexes;
     document.getElementById("paragraphe_nb_lignes"            ).innerHTML = nb_lignes;
     document.getElementById("paragraphe_nb_colonnes"          ).innerHTML = nb_colonnes;
     
-    //On bloque le bouton de connexion ssi le nombre de points répartis est négatif
-    document.getElementById("bouton_jouer").disabled = (nb_points_non_repartis < 0);
-    
+    //On active le bouton de connexion ssi le nombre de points répartis est positif ou nul
+    activerBouton("bouton_jouer", (nb_points_non_repartis >= 0), "demanderJoindrePartie()");
+    document.getElementById("paragraphe_points_non_repartis").style.color = ((nb_points_non_repartis >= 0) ? "#99F" : "#F00")
 }
