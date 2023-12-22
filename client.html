@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <link rel="stylesheet" href="style.css" />
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="./fonctions_de_jeu.js" type="text/javascript" language="javascript"></script>
@@ -35,11 +36,11 @@
             //On modifie l'interface
             enleverMenuCreationPartie();
             document.getElementById("paragraphe_liste_joueurs").innerHTML = infos.liste_joueurs.join(" "); // On affiche la liste des joueurs
-            ajouterMenuPouvoirs();
             
             // Si l'on a le bon nombre de joueurs
             if(infos.liste_joueurs.length == infos.nb_joueurs_max) {
                 enleverMenuConnexion();
+                ajouterMenuPouvoirs();
                 infos.liste_terrain = genererTerrain(infos.nb_joueurs_max, infos.nb_lignes, infos.nb_colonnes);
                 infos.liste_entites = genererEntites(infos)
                 infos.liste_points  = Array(infos.liste_joueurs.length).fill(0);
@@ -103,12 +104,14 @@
             <h2 id="paragraphe_noms_gagnants"></h2>
         </div>
         <div id="menu_connexion">
+            <hr>
             <h3>Connexion</h3>
             Nom du joueur : <input type="text" id="champ_nom_joueur" /> </br>
             Nombre de points non répartis : <a id="paragraphe_points_non_repartis"></a> / 9 </br>
             Force des créatures : <input type="range" id="champ_force" oninput="updateRanges()" min="1" max="5" value="3" /> <a id="paragraphe_force"></a> </br>
             Perception des créatures : <input type="range" id="champ_perception" oninput="updateRanges()" min="1" max="5" value="3" /> <a id="paragraphe_perception"></a> </br>
             Taux de reproduction des créatures : <input type="range" id="champ_taux_reproduction" oninput="updateRanges()" min="1" max="5" value="3" /> <a id="paragraphe_taux_reproduction"></a> </br>
+            <hr>
         </div>
         <div id="menu_creation_partie">
             <h3>Création d'une partie</h3>
@@ -128,13 +131,34 @@
 
     <div id="menu_pouvoirs" style="display:none">
         <h3>Pouvoirs</h3>
-        <input type="button" onclick="setPouvoir(0)" id="bouton_total_energies" value="Total Energies (40pts)" /> <a>Appuyez sur une prairie pour que vos entités y déploient une entreprise pétrolière</a> </br>
-        <input type="button" onclick="setPouvoir(1)" id="bouton_abracadabra" value="Abracadabra (50pts)" /> <a>Appuyez sur un rocher et une eau/prairie pour les échanger</a> </br>
-        <input type="button" onclick="setPouvoir(2)" id="bouton_big_brain_time" value="It's big brain time (75pts)" /> <a>Vos entités évaluent 25 cases en plus avant de faire leur choix</a> </br>
-        <input type="button" onclick="setPouvoir(3)" id="bouton_vision_ensemble" value="Vision d'ensemble (100pts)" /> <a>Vos entités peuvent voir une case plus loin</a> </br>
-        <input type="button" onclick="setPouvoir(4)" id="bouton_hoax" value="It's a hoax (130pts)" /> <a>Vos entités ignorent le réchauffement climatique chaque prairie a une chance sur deux de disparaître</a> </br>
-        <input type="button" onclick="setPouvoir(5)" id="bouton_ineluctable" value="Désormais inéluctable (200pts)" /> <a>Vos entités obtiennent un gant d'infinité et font disparaître en moyenne la moitié des entités adverses</a> </br>
-        <input type="button" onclick="setPouvoir(6)" id="bouton_superintelligence" value="The Superintelligent Will (500pts)" /> <a>Vos entités ignorent les conseils des chercheurs en sécurité de l'IA et développent une superintelligence</a> </br>
+        <div class="bouton" onclick="setPouvoir(0)">
+            <h3>Total Energies (40pts)</h3>
+            <a>Appuyez sur une prairie pour que vos entités y déploient une entreprise pétrolière</a> </br>
+        </div>
+        <div class="bouton" onclick="setPouvoir(1)">
+            <h3>Abracadabra (50pts)</h3>
+            <a>Appuyez sur un rocher et une eau/prairie pour les échanger</a> </br>
+        </div>
+        <div class="bouton" onclick="setPouvoir(2)">
+            <h3>It's big brain time (75pts)</h3>
+            <a>Vos entités évaluent 25 cases en plus avant de faire leur choix</a> </br>
+        </div>
+        <div class="bouton" onclick="setPouvoir(3)">
+            <h3>Vision d'ensemble (100pts)</h3>
+            <a>Vos entités peuvent voir une case plus loin</a> </br>
+        </div>
+        <div class="bouton" onclick="setPouvoir(4)">
+            <h3>It's a hoax (130pts)</h3>
+            <a>Vos entités ignorent le réchauffement climatique chaque prairie a une chance sur deux de disparaître</a> </br>
+        </div>
+        <div class="bouton" onclick="setPouvoir(5)">
+            <h3>Désormais inéluctable (200pts)</h3>
+            <a>Vos entités obtiennent un gant d'infinité et font disparaître en moyenne la moitié des entités adverses</a> </br>
+        </div>
+        <div class="bouton" onclick="setPouvoir(6)">
+            <h3>The Superintelligent Will (500pts)</h3>
+            <a>Vos entités ignorent les conseils des chercheurs en sécurité de l'IA et développent une superintelligence</a> </br>
+        </div>
     </div>
 
     <div id="menu_fin_superintelligence" style="display:none">
