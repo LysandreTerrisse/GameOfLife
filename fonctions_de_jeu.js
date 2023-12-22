@@ -102,24 +102,27 @@ function getNewStats(entite, liste_terrain) {
 function boucle(infos, iteration=1) {
     //On attend un certain temps avant de lancer le tick et de le dessiner
     //S'il y a du retard, on attend moins longtemps pour rattraper ce retard.
-    let temps_a_attendre = (infos.debut_partie + (infos.temps_tick * iteration)) - Date.now(); //ATTENTION : Si l'on change 100 par une autre valeur, il faut aussi la modifier sur le serveur dans le socket.on("envoyer_pouvoir")
+    let temps_a_attendre = (infos.debut_partie + (infos.temps_tick * iteration)) - Date.now();
     //Si on est en retard d'au moins un tick, on appelle setTimeout une fois sur 1000 pour éviter les erreurs de récursion.
     //(On appelle setTimeout le moins que possible car cela fait perdre au moins 4ms, même en donnant un nombre négatif)
     if(temps_a_attendre > 0 || (iteration % 1000 == 0)) {
         setTimeout(() => {
-            tick(infos.liste_terrain, infos.liste_entites, infos.liste_scores, infos.liste_actions, infos.liste_joueurs.length, infos.nb_sexes, iteration);
+            tick(infos.liste_terrain, infos.liste_entites, infos.liste_points, infos.liste_actions, infos.liste_joueurs.length, infos.nb_sexes, iteration);
             dessinerEntites(infos.liste_entites, 10, 30);
-            document.getElementById("paragraphe_liste_scores").innerHTML = infos.liste_scores.join(" ");
+            document.getElementById("paragraphe_liste_points").innerHTML = infos.liste_points.join(" ");
             if(iteration!=infos.nb_iterations_max && infos.liste_entites.length != 0) {
                 boucle(infos, iteration + 1)
+            } else {
+                finPartie(infos.liste_points, infos.liste_joueurs);
             }
         }, temps_a_attendre);
     } else {
-        tick(infos.liste_terrain, infos.liste_entites, infos.liste_scores, infos.liste_actions, infos.liste_joueurs.length, infos.nb_sexes, iteration);
+        tick(infos.liste_terrain, infos.liste_entites, infos.liste_points, infos.liste_actions, infos.liste_joueurs.length, infos.nb_sexes, iteration);
         if(iteration!=infos.nb_iterations_max && infos.liste_entites.length != 0) {
             boucle(infos, iteration + 1)
         } else {
             dessinerEntites(infos.liste_entites, 10, 30);
+            finPartie(infos.liste_points, infos.liste_joueurs);
         }
     }
 }
@@ -132,7 +135,7 @@ function moyenne(a, b) {
 /* augmentait exponentiellement, et pouvait dépasser les 100000 en moins d'une centaine       */
 /* d'itérations, faisant crasher la page. Nous avons donc décidé que chaque joueur a au plus  */
 /* 100 entités, mais que son score continue d'augmenter après cela.                           */
-function faireBebes(entite1, entite2, nb_sexes, liste_entites, liste_scores, tailles_tribus) {
+function faireBebes(entite1, entite2, nb_sexes, liste_entites, liste_points, tailles_tribus) {
     //On met l'abstinence des entités à 0
     entite1.abstinence = 0;
     entite2.abstinence = 0;
@@ -159,7 +162,7 @@ function faireBebes(entite1, entite2, nb_sexes, liste_entites, liste_scores, tai
     }
     
     //
-    liste_scores[entite1.tribu] += entite1.taux_reproduction;
+    liste_points[entite1.tribu] += entite1.taux_reproduction;
 }
 
 /* Renvoie une liste contenant les tailles de chaque tribu */
@@ -186,7 +189,7 @@ function getListeTanieres(liste_entites, liste_terrain, nb_joueurs) {
 }
 
 
-function tick(liste_terrain, liste_entites, liste_scores, liste_actions, nb_joueurs, nb_sexes, iteration) {
+function tick(liste_terrain, liste_entites, liste_points, liste_actions, nb_joueurs, nb_sexes, iteration) {
     let [nb_lignes, nb_colonnes] = [liste_terrain.length, liste_terrain[0].length];
     
     /* Lorsqu'un utilisateur arrive en milieu de partie, ou prend du retard, le serveur lui enverra une liste d'actions */
@@ -197,7 +200,7 @@ function tick(liste_terrain, liste_entites, liste_scores, liste_actions, nb_joue
     //Tant qu'un joueur a fait une action à ce tick
     while(liste_actions.length > 0 && liste_actions[0][3] == iteration) {
         let action = liste_actions.shift();
-        executerAction(action, liste_terrain, liste_entites, liste_scores);
+        executerAction(action, liste_terrain, liste_entites, liste_points);
     }
     
     //On bouge toutes les entités
@@ -231,9 +234,18 @@ function tick(liste_terrain, liste_entites, liste_scores, liste_actions, nb_joue
                 //Si elles sont de sexe différent et qu'elles ont toutes les deux un taux d'abstinence supérieur ou égal à 5
                 if(entite1.sexe != entite2.sexe && entite1.abstinence >= 5 && entite2.abstinence >= 5) {
                     //Elles font des bébés
-                    faireBebes(entite1, entite2, nb_sexes, liste_entites, liste_scores, tailles_tribus);
+                    faireBebes(entite1, entite2, nb_sexes, liste_entites, liste_points, tailles_tribus);
                 }
             }
         }
     }
+}
+
+
+function finPartie(liste_points, liste_joueurs) {
+    enleverMenuPouvoirs();
+    let score_max = Math.max(...liste_points);
+    let indice_vainqueur = liste_points.indexOf(score_max);
+    let nom_vainqueur = liste_joueurs[indice_vainqueur]
+    document.getElementById("paragraphe_nom_vainqueur").innerHTML = nom_vainqueur + " " + "gagne !";
 }
