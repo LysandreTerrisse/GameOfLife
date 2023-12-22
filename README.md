@@ -1,6 +1,8 @@
 # Le jeu de la vie
 Par Lysandre Terrisse et Emmanuel Sanchez
 
+CMI Groupe A
+
 Cliquez [ici](https://github.com/LysandreTerrisse/Le-jeu-de-la-vie/tree/main) pour accéder au GitHub.
 
 ## Commandes
