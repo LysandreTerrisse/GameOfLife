@@ -30,7 +30,5 @@ Fait :
     - Empêcher l'appui de boutons lorsque les paramètres sont invalides
     - Enlever des points lorsque l'on fait une action
     - Le gagnant est celui qui a le plus de créatures
-
-À faire :
     - Faire un long texte sur la sécurité de l'IA
     - Faire le CSS
